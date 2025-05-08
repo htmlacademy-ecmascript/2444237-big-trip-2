@@ -1,0 +1,3 @@
+const POINT_COUNT = 3;
+const DATE_FORMAT = 'D MMMM';
+export {POINT_COUNT, DATE_FORMAT};
