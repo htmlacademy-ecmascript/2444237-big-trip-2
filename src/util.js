@@ -1,14 +1,18 @@
 import dayjs from 'dayjs';
-import { DATE_FORMAT } from './const.js';
+import { DATE_FORMAT} from './const.js';
 
 function getRandomPointArray(pointArray) {
   return pointArray[Math.floor(Math.random() * pointArray.length)];
 }
+
 function getDuration(dateFrom, dateTo) {
-  return dayjs(dateTo).diff(dayjs(dateFrom), 'days');
+  const diffInMinutes = dayjs(dateTo).diff(dayjs(dateFrom), 'minute');
+  const hours = Math.floor(diffInMinutes / 60);
+  const minutes = diffInMinutes % 60;
+  return `${hours}H ${minutes}M`;
 }
 
-function humanizeDate(date) {
-  return dayjs(date).format(DATE_FORMAT);
+function humanizeDate(date, format = DATE_FORMAT) {
+  return dayjs(date).format(format);
 }
 export { getRandomPointArray, getDuration, humanizeDate };

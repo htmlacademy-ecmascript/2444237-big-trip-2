@@ -3,9 +3,24 @@ export const offersMock = [
     'type': 'taxi',
     'offers': [
       {
-        'id': 'b4c3e4e6-9053-42ce-b747-e281314baa31',
-        'title': 'Upgrade to a business class',
+        'id': 'taxi1',
+        'title': 'Eco',
+        'price': 50
+      },
+      {
+        'id': 'taxi2',
+        'title': 'Comfort',
         'price': 120
+      },
+      {
+        'id': 'taxi3',
+        'title': 'business class',
+        'price': 150
+      },
+      {
+        'id': 'taxi4',
+        'title': 'business class',
+        'price': 170
       }
     ]
   },
@@ -13,19 +28,39 @@ export const offersMock = [
     'type': 'bus',
     'offers': [
       {
-        'id': 'b4c3e4e6-9053-42ce-c747-e281314baa31',
-        'title': 'Upgrade to a business class',
+        'id': 'bus1',
+        'title': 'Eco',
         'price': 50
-      }
+      },
+      {
+        'id': 'bus2',
+        'title': 'Comfort',
+        'price': 150
+      },
+      {
+        'id': 'bus3',
+        'title': 'Best',
+        'price': 130
+      },
+      {
+        'id': 'bus4',
+        'title': 'bus',
+        'price': 120
+      },
     ]
   },
   {
     'type': 'train',
     'offers': [
       {
-        'id': 'b4c3e4e6-9053-41ce-b747-e281314baa31',
-        'title': 'Upgrade to a business class',
+        'id': 'train1',
+        'title': 'Train',
         'price': 70
+      },
+      {
+        'id': 'train2',
+        'title': 'Train2',
+        'price': 90
       }
     ]
   },
@@ -33,8 +68,8 @@ export const offersMock = [
     'type': 'ship',
     'offers': [
       {
-        'id': 'b4c3e456-9053-41ce-b747-e281314baa31',
-        'title': 'Upgrade to a business class',
+        'id': 'shp1',
+        'title': 'Ship ticket',
         'price': 1170
       }
     ]

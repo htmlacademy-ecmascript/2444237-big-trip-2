@@ -18,7 +18,6 @@ export default class BoardPresenter {
     render(new FormEditView(
       {
         points: this.boardPoints[0],
-        checkOffers: this.pointsModel.getOffersById(this.boardPoints[0].type, this.boardPoints[0].offers),
         offers: this.pointsModel.getOfferByType(this.boardPoints[0].type),
         destination: this.pointsModel.getDestinationById(this.boardPoints[0].destination)
       }
