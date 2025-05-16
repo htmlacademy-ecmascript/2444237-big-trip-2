@@ -28,7 +28,7 @@ export default class BoardPresenter {
       render(new EventView(
         {
           point: this.boardPoints[i],
-          offers: offerByType ? offerByType.offers : [],
+          offers: offerByType ? offerByType : [],
           destination: this.pointsModel.getDestinationById(this.boardPoints[i].destination)
         }
       ), this.eventListView.getElement());

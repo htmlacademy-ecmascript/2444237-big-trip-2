@@ -17,6 +17,7 @@ export class PointModel {
 
   getOffersById(id) {
     const offers = this.getOffers();
+
     return offers.find((offer) => offer.id === id);
   }
 
@@ -26,16 +27,19 @@ export class PointModel {
 
   getPointById(id) {
     const points = this.getPoint();
+
     return points.find((point) => point === id);
   }
 
   getOfferByType(type) {
     const offers = this.getOffers();
-    return offers.find((offer) => offer.type === type);
+
+    return offers.find((offer) => offer.type === type).offers;
   }
 
   getDestinationById(id) {
     const destinations = this.getDestination();
+
     return destinations.find((destination) => destination.id === id);
   }
 }

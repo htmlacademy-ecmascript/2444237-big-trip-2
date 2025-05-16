@@ -1,10 +1,26 @@
-/* eslint-disable indent */
 import { createElement } from '../render.js';
 import { humanizeDate, getDuration } from '../util.js';
 import { TIME_FORMAT } from '../const.js';
 
+const renderListOffers = (checkOffers) => {
+  if(checkOffers.length === 0) {
+    return '';
+  }
+
+  return (
+    `<ul class="event__selected-offers">
+      ${checkOffers.map((offer) => `
+        <li class="event__offer">
+          <span class="event__offer-title">${offer.title}</span>
+          &plus;&euro;&nbsp;
+          <span class="event__offer-price">${offer.price}</span>
+        </li>`).join('\n')}
+    </ul>
+  `);
+};
+
 function createEventTemplate(point, allOffers, destination) {
-  const {name} = destination;
+  const { name } = destination;
   const checkOffers = point.offers.map((offer) => allOffers.find((offerAll) => offerAll.id === offer));
   return (
     `<li class="trip-events__item">
@@ -26,15 +42,7 @@ function createEventTemplate(point, allOffers, destination) {
                 &euro;&nbsp;<span class="event__price-value">${point.base_price}</span>
               </p>
               <h4 class="visually-hidden">Offers:</h4>
-              <ul class="event__selected-offers">
-                ${checkOffers.length > 0 ? checkOffers.map((offer) => (
-                  `<li class="event__offer">
-                    <span class="event__offer-title">${offer.title}</span>
-                    &plus;&euro;&nbsp;
-                    <span class="event__offer-price">${offer.price}</span>
-                  </li>`
-                )).join('\n') : ''}
-              </ul>
+              ${renderListOffers(checkOffers)}
               <button class="event__favorite-btn event__favorite-btn--active" type="button">
                 <span class="visually-hidden">Add to favorite</span>
                 <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
