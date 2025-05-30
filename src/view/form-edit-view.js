@@ -1,8 +1,11 @@
-/* eslint-disable no-unused-expressions */
-import { createElement } from '../render.js';
 import { humanizeDate } from '../util.js';
 import { FORM_EDIT_DATE } from '../const.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
+/**
+ * Рендерит список событий
+ * @return {string} Разметка списка событий
+ */
 const renderTypes = () => (
   `<div class="event__type-list">
       <fieldset class="event__type-group">
@@ -48,6 +51,14 @@ const renderTypes = () => (
       </div>
     </div>`
 );
+/**
+ * Рендерит список офферов
+ * @param {Object[]} allOffers - массив всех офферов
+ * @param {number[]} pointOffers - массив офферов текущей точки
+ * @param {number} pointId - id текущей точки
+ * @return {string} Разметка списка офферов
+ */
+
 const renderPointOffers = (allOffers, pointOffers, pointId) => {
   if(allOffers.length === 0) {
     return '';
@@ -57,13 +68,16 @@ const renderPointOffers = (allOffers, pointOffers, pointId) => {
     <h3 class="event__section-title event__section-title--offers">Offers</h3>
     <div class="event__available-offers">
       ${allOffers.map((offer) => {
+        
     const isChecked = pointOffers.includes(offer.id);
+
     return `<div class="event__offer-selector">
             <input
             class="event__offer-checkbox visually-hidden"
             id="event-offer-${offer.id}-${pointId}"
             type="checkbox"
-            name="event-offer-${offer.id}" ${isChecked ? 'checked' : ''}>
+            name="event-offer-${offer.id}"
+            ${isChecked ? 'checked' : ''}>
             <label class="event__offer-label" for="event-offer-${offer.id}-${pointId}">
               <span class="event__offer-title">${offer.title}</span>
               &plus;&euro;&nbsp;
@@ -74,6 +88,14 @@ const renderPointOffers = (allOffers, pointOffers, pointId) => {
     </div>
   </section>`;
 };
+
+/**
+ * Создает разметку формы редактирования
+ * @param {Object} point Объект точки
+ * @param {Object[]} allOffers Массив всех офферов
+ * @param {Object} destination Объект место назначения
+ * @return {string} Разметка формы редактирования
+ */
 
 function createFormEditTemplate(point, allOffers, destination) {
   return (
@@ -129,25 +151,36 @@ function createFormEditTemplate(point, allOffers, destination) {
   );
 }
 
-export default class FormEditView {
-  constructor({points, offers, destination}) {
-    this.point = points;
-    this.offers = offers;
-    this.destination = destination;
+/**
+ * @type {FormEditView} Форма редктирования
+ * @param {Object} point Объект точки
+ * @param {Object} offers Объект офферов
+ * @param {Object} destination Объект место назначения
+ * @param {function} onFormSubmit Обработчик отправки формы
+ */
+
+export default class FormEditView extends AbstractView {
+  #point = null;
+  #offers = null;
+  #destination = null;
+  #onFormSubmit = null;
+
+  constructor({points, offers, destination, onFormSubmit}) {
+    super();
+    this.#point = points;
+    this.#offers = offers;
+    this.#destination = destination;
+    this.#onFormSubmit = onFormSubmit;
+
+    this.element.addEventListener('submit', this.#handleFormSubmit);
   }
 
-  getTemplate() {
-    return createFormEditTemplate(this.point, this.offers, this.destination);
+  get template() {
+    return createFormEditTemplate(this.#point, this.#offers, this.#destination);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
+  #handleFormSubmit = (evt) => {
+    evt.preventDefault();
+    this.#onFormSubmit();
   }
 }

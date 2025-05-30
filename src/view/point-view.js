@@ -1,6 +1,12 @@
-import { createElement } from '../render.js';
 import { humanizeDate, getDuration } from '../util.js';
 import { TIME_FORMAT } from '../const.js';
+import AbstractView from '../framework/view/abstract-view.js';
+
+/**
+ * Функция для создания разметки списка офферов
+ * @param {array} checkOffers - массив офферов
+ * @returns {string} Разметка списка офферов
+ */
 
 const renderListOffers = (checkOffers) => {
   if(checkOffers.length === 0) {
@@ -19,6 +25,13 @@ const renderListOffers = (checkOffers) => {
   `);
 };
 
+/**
+ * Функция для создания разметки карточки события
+ * @param {object} point Объект точки
+ * @param {array} allOffers Массив офферов
+ * @param {object} destination Объект место назначения
+ * @returns {string} Разметка карточки события
+ */
 function createEventTemplate(point, allOffers, destination) {
   const { name } = destination;
   const checkOffers = point.offers.map((offer) => allOffers.find((offerAll) => offerAll.id === offer));
@@ -29,7 +42,9 @@ function createEventTemplate(point, allOffers, destination) {
               <div class="event__type">
                 <img class="event__type-icon" width="42" height="42" src="img/icons/${point.type}.png" alt="Event type icon">
               </div>
-              <h3 class="event__title">${point.type} ${name}</h3>
+              <h3 class="event__title">
+                ${point.type} ${name}
+              </h3>
               <div class="event__schedule">
                 <p class="event__time">
                   <time class="event__start-time" datetime=${humanizeDate(point.date_from, TIME_FORMAT)}>${humanizeDate(point.date_from, TIME_FORMAT)}</time>
@@ -57,26 +72,37 @@ function createEventTemplate(point, allOffers, destination) {
   );
 }
 
-export default class EventView {
-  constructor({point, offers, destination}) {
-    this.points = point;
-    this.offers = offers;
-    this.destination = destination;
+/**
+ * Класс представления события
+ * @type {EventView}
+ * @prop {object} point Объект точки
+ * @prop {object} offers Объект офферов
+ * @prop {object} destination Объект места назначения
+ * @prop {function} onClick Обработчик клика на карточку точки
+ */
+
+export default class EventView extends AbstractView {
+  #point = null;
+  #offers = null;
+  #destination = null;
+  #onClick = null;
+
+  constructor({point, offers, destination, onClick}) {
+    super();
+    this.#point = point;
+    this.#offers = offers;
+    this.#destination = destination;
+    this.#onClick = onClick;
+
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#handleClick);
   }
 
-  getTemplate() {
-    return createEventTemplate(this.points, this.offers, this.destination);
+  get template() {
+    return createEventTemplate(this.#point, this.#offers, this.#destination);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
+  #handleClick = (evt) => {
+    evt.preventDefault();
+    this.#onClick();
   }
 }

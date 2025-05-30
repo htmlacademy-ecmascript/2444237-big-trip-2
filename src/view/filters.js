@@ -1,4 +1,8 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
+/**
+ *  Функция для создания разметки фильтров
+ * @returns {string} Разметка фильтров
+ */
 function createFilterTemplate() {
   return (
     `<form class="trip-filters" action="#" method="get">
@@ -27,20 +31,12 @@ function createFilterTemplate() {
   );
 }
 
-export default class FiltersView {
-  getTemplate() {
+/**
+ * Класс фильтров
+ */
+export default class FiltersView extends AbstractView {
+  get template() {
     return createFilterTemplate();
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
-  }
 }
