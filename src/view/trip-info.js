@@ -1,5 +1,9 @@
-import { createElement } from '../render.js';
+import AbstractView from "../framework/view/abstract-view";
 
+/**
+ * Функция для создания разметки информации о поездке
+ * @returns {string} Разметка информации о поездке
+ */
 function createTripInfoTemplate () {
   return (
     `<section class="trip-main__trip-info  trip-info">
@@ -13,20 +17,11 @@ function createTripInfoTemplate () {
       </section>`
   );
 }
-export default class TripInfoView {
-  getTemplate() {
+/**
+ * Класс представления информации о поездке
+ */
+export default class TripInfoView extends AbstractView {
+  get template() {
     return createTripInfoTemplate();
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
   }
 }
