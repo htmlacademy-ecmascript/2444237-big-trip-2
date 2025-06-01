@@ -15,4 +15,5 @@ function getDuration(dateFrom, dateTo) {
 function humanizeDate(date, format = DATE_FORMAT) {
   return dayjs(date).format(format);
 }
+
 export { getRandomPointArray, getDuration, humanizeDate };

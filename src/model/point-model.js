@@ -2,6 +2,7 @@ import { POINT_COUNT } from '../const.js';
 import { getRandomPoint } from '../mock/points.js';
 import { offersMock } from '../mock/offers.js';
 import { destinationMock } from '../mock/destination.js';
+
 export class PointModel {
   point = Array.from({length: POINT_COUNT}, getRandomPoint);
   offers = offersMock;

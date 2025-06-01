@@ -1,18 +1,11 @@
-// eslint-disable-next-line no-undef
 const path = require('path');
-// eslint-disable-next-line no-undef
 const CopyPlugin = require('copy-webpack-plugin');
-
-// eslint-disable-next-line no-undef
 const HtmlPlugin = require('html-webpack-plugin');
 
-
-// eslint-disable-next-line no-undef
 module.exports = {
   entry: './src/main.js',
   output: {
     filename: 'bundle.[contenthash].js',
-    // eslint-disable-next-line no-undef
     path: path.resolve(__dirname, 'build'),
     clean: true,
   },
@@ -43,6 +36,10 @@ module.exports = {
             presets: ['@babel/preset-env'],
           },
         },
+      },
+      {
+        test: /\.css$/i,
+        use: ['style-loader', 'css-loader'],
       }
     ]
   }

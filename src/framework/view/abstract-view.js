@@ -14,6 +14,10 @@ export default class AbstractView {
   /** @type {HTMLElement|null} Элемент представления */
   #element = null;
 
+  /**
+   * @constructor
+   * @throws {Error} если попытаться создать экземпляр AbstractView
+   */
   constructor() {
     if (new.target === AbstractView) {
       throw new Error('Can\'t instantiate AbstractView, only concrete one.');
