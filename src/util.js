@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { DATE_FORMAT} from './const.js';
+import { DATE_FORMAT, FilterType} from './const.js';
 
 function getRandomPointArray(pointArray) {
   return pointArray[Math.floor(Math.random() * pointArray.length)];
@@ -12,8 +12,15 @@ function getDuration(dateFrom, dateTo) {
   return `${hours}H ${minutes}M`;
 }
 
+const filter = {
+ [FilterType.EVERYTHING]: (tasks) => tasks,
+ [FilterType.FUTURE]: (tasks) => tasks.filter((task) => humanizeDate(task.dateFrom) > humanizeDate(new Date())),
+ [FilterType.PRESENT]: (tasks) => tasks.filter((task) => humanizeDate(task.dateFrom) === humanizeDate(new Date())), 
+ [FilterType.PAST]: (tasks) => tasks.filter((task) => humanizeDate(task.dateFrom) < humanizeDate(new Date())),            
+};
+
 function humanizeDate(date, format = DATE_FORMAT) {
   return dayjs(date).format(format);
 }
 
-export { getRandomPointArray, getDuration, humanizeDate };
+export { getRandomPointArray, getDuration, humanizeDate, filter };

@@ -3,17 +3,18 @@ import { getRandomPoint } from '../mock/points.js';
 import { offersMock } from '../mock/offers.js';
 import { destinationMock } from '../mock/destination.js';
 
+
 export class PointModel {
-  point = Array.from({length: POINT_COUNT}, getRandomPoint);
-  offers = offersMock;
-  destination = destinationMock;
+  #point = Array.from({length: POINT_COUNT}, getRandomPoint);
+  #offers = offersMock;
+  #destination = destinationMock;
 
   getPoint() {
-    return this.point;
+    return this.#point;
   }
 
   getOffers() {
-    return this.offers;
+    return this.#offers;
   }
 
   getOffersById(id) {
@@ -23,7 +24,7 @@ export class PointModel {
   }
 
   getDestination() {
-    return this.destination;
+    return this.#destination;
   }
 
   getPointById(id) {
