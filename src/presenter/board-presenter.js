@@ -1,4 +1,4 @@
-import {render, replace} from '../framework/render.js';
+import { render, replace } from '../framework/render.js';
 import EventListView from '../view/event-list-view.js';
 import EventView from '../view/point-view.js';
 import FormEditView from '../view/form-edit-view.js';
@@ -8,7 +8,7 @@ import FailedDataView from '../view/failed-data.js';
 export default class BoardPresenter {
   #container = null;
   #pointsModel = null;
-  #fieledComponent = null;
+  #fieldComponent = null;
   eventListView = new EventListView();
 
   constructor(container, pointsModel) {
@@ -32,8 +32,8 @@ export default class BoardPresenter {
   }
 
   #renderFailedData() {
-    this.#fieledComponent = new FailedDataView();
-    render(this.#fieledComponent, this.#container);
+    this.#fieldComponent = new FailedDataView();
+    render(this.#fieldComponent, this.#container);
   }
 
   #renderEvent (event, offerByType) {
@@ -43,7 +43,7 @@ export default class BoardPresenter {
         replaceEditFormToPoint();
         document.removeEventListener('keydown', escKeyDownHandler);
       }
-    } 
+    };
     const point = new EventView({
       point: event,
       offers: offerByType ? offerByType : [],
@@ -52,7 +52,7 @@ export default class BoardPresenter {
         replacePointToEditForm();
         document.addEventListener('keydown', escKeyDownHandler);
       }
-    })
+    });
     const editForm = new FormEditView({
       points: event,
       offers: offerByType ? offerByType : [],
@@ -61,8 +61,7 @@ export default class BoardPresenter {
         replaceEditFormToPoint();
         document.removeEventListener('keydown', escKeyDownHandler);
       },
-    })
-
+    });
 
     function replacePointToEditForm() {
       replace(editForm, point);

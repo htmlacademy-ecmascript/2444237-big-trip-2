@@ -10,6 +10,7 @@ function createEventListTemplate () {
     `
   );
 }
+
 /**
  * Класс представления списка событий
  */

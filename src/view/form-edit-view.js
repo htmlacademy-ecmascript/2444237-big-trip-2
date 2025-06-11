@@ -68,7 +68,7 @@ const renderPointOffers = (allOffers, pointOffers, pointId) => {
     <h3 class="event__section-title event__section-title--offers">Offers</h3>
     <div class="event__available-offers">
       ${allOffers.map((offer) => {
-        
+
     const isChecked = pointOffers.includes(offer.id);
 
     return `<div class="event__offer-selector">
@@ -96,7 +96,6 @@ const renderPointOffers = (allOffers, pointOffers, pointId) => {
  * @param {Object} destination Объект место назначения
  * @return {string} Разметка формы редактирования
  */
-
 function createFormEditTemplate(point, allOffers, destination) {
   return (
     `<form class="event event--edit" action="#" method="post">
@@ -158,7 +157,6 @@ function createFormEditTemplate(point, allOffers, destination) {
  * @param {Object} destination Объект место назначения
  * @param {function} onFormSubmit Обработчик отправки формы
  */
-
 export default class FormEditView extends AbstractView {
   #point = null;
   #offers = null;
@@ -182,5 +180,5 @@ export default class FormEditView extends AbstractView {
   #handleFormSubmit = (evt) => {
     evt.preventDefault();
     this.#onFormSubmit();
-  }
+  };
 }
