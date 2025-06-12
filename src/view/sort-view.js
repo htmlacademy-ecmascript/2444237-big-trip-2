@@ -1,6 +1,6 @@
-import AbstractView from "../framework/view/abstract-view";
+import AbstractView from '../framework/view/abstract-view';
 /**
- * Функция для создания разметки 
+ * Функция для создания разметки
  * @returns {string} Разметка сортировки
  */
 function createSortTemplate() {
@@ -33,6 +33,7 @@ function createSortTemplate() {
       </form>`
   );
 }
+
 /**
  *  Класс отображения сортировки
  */

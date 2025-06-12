@@ -104,5 +104,5 @@ export default class EventView extends AbstractView {
   #handleClick = (evt) => {
     evt.preventDefault();
     this.#onClick();
-  }
+  };
 }

@@ -1,4 +1,4 @@
-import AbstractView from "../framework/view/abstract-view";
+import AbstractView from '../framework/view/abstract-view';
 
 /**
  * Функция для создания разметки информации о поездке
@@ -17,6 +17,7 @@ function createTripInfoTemplate () {
       </section>`
   );
 }
+
 /**
  * Класс представления информации о поездке
  */

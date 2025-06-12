@@ -1,5 +1,10 @@
 import dayjs from 'dayjs';
-import { DATE_FORMAT} from './const.js';
+import { DATE_FORMAT, FilterType} from './const.js';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+
+dayjs.extend(isSameOrBefore);
+dayjs.extend(isSameOrAfter);
 
 function getRandomPointArray(pointArray) {
   return pointArray[Math.floor(Math.random() * pointArray.length)];
@@ -12,8 +17,15 @@ function getDuration(dateFrom, dateTo) {
   return `${hours}H ${minutes}M`;
 }
 
+const filter = {
+  [FilterType.EVERYTHING]: (points) => points,
+  [FilterType.FUTURE]: (points) => points.filter((point) => dayjs(point.dateFrom).isAfter(new Date())),
+  [FilterType.PRESENT]: (points) => points.filter((point) => dayjs(point.dateFrom).isSameOrBefore(new Date()) && dayjs(point.dateTo).isSameOrAfter(new Date())),
+  [FilterType.PAST]: (points) => points.filter((point) => dayjs(point.dateTo).isBefore(new Date())),
+};
+
 function humanizeDate(date, format = DATE_FORMAT) {
   return dayjs(date).format(format);
 }
 
-export { getRandomPointArray, getDuration, humanizeDate };
+export { getRandomPointArray, getDuration, humanizeDate, filter };
