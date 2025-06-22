@@ -28,4 +28,7 @@ function humanizeDate(date, format = DATE_FORMAT) {
   return dayjs(date).format(format);
 }
 
-export { getRandomPointArray, getDuration, humanizeDate, filter };
+function updateItem (items, update) {
+  return items.map((item) => item.id === update.id ? update : item)
+}
+export { getRandomPointArray, getDuration, humanizeDate, filter, updateItem };
