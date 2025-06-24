@@ -10,7 +10,7 @@ export default class BoardPresenter {
   #pointsModel = null;
   #fieldComponent = null;
   #pointPresenters = new Map();
-  #boardPoints = null
+  #boardPoints = null;
   eventListView = new EventListView();
 
   constructor(container, pointsModel) {
@@ -20,14 +20,14 @@ export default class BoardPresenter {
 
   init () {
     this.#boardPoints = [...this.#pointsModel.getPoint()];
-    if(this.#boardPoints.length === 0) {
+    if (this.#boardPoints.length === 0) {
       this.#renderFailedData();
       return;
     }
     render(new SortView(), this.#container);
     render(this.eventListView, this.#container);
 
-    for(let i = 0; i < this.#boardPoints.length; i++) {
+    for (let i = 0; i < this.#boardPoints.length; i++) {
       const offerByType = this.#pointsModel.getOfferByType(this.#boardPoints[i].type);
       this.#renderEvent(this.#boardPoints[i], offerByType);
     }
@@ -52,12 +52,13 @@ export default class BoardPresenter {
 
   #handlePointChange = (updatePoint) => {
     this.#boardPoints = updateItem(this.#boardPoints, updatePoint);
-    this.#pointPresenters.get(updatePoint.id).init(updatePoint)
-  }
+    const offerByType = this.#pointsModel.getOfferByType(updatePoint.type);
+    this.#pointPresenters.get(updatePoint.id).init(updatePoint, offerByType);
+  };
 
   #handleModeChange = () => {
     this.#pointPresenters.forEach((presenter) => presenter.reset());
-  }
+  };
 
   #clearPointList() {
     this.#pointPresenters.forEach((presenter) => presenter.destroy());

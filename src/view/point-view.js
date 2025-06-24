@@ -2,14 +2,8 @@ import { humanizeDate, getDuration } from '../util.js';
 import { TIME_FORMAT } from '../const.js';
 import AbstractView from '../framework/view/abstract-view.js';
 
-/**
- * Функция для создания разметки списка офферов
- * @param {array} checkOffers - массив офферов
- * @returns {string} Разметка списка офферов
- */
-
 const renderListOffers = (checkOffers) => {
-  if(checkOffers.length === 0) {
+  if (checkOffers.length === 0) {
     return '';
   }
 
@@ -25,16 +19,10 @@ const renderListOffers = (checkOffers) => {
   `);
 };
 
-/**
- * Функция для создания разметки карточки события
- * @param {object} point Объект точки
- * @param {array} allOffers Массив офферов
- * @param {object} destination Объект место назначения
- * @returns {string} Разметка карточки события
- */
 function createEventTemplate(point, allOffers, destination) {
   const { name } = destination;
   const checkOffers = point.offers.map((offer) => allOffers.find((offerAll) => offerAll.id === offer));
+
   return (
     `<li class="trip-events__item">
             <div class="event">
@@ -58,8 +46,8 @@ function createEventTemplate(point, allOffers, destination) {
               </p>
               <h4 class="visually-hidden">Offers:</h4>
               ${renderListOffers(checkOffers)}
-              <button class="event__favorite-btn event__favorite-btn--active" type="button">
-                <span class="visually-hidden">Add to favorite</span>
+                <button class="event__favorite-btn ${point.is_favorite ? 'event__favorite-btn--active' : ''}" type="button">
+                <span class="visually-hidden">${point.is_favorite ? 'Remove from favorite' : 'Add to favorite'}</span>
                 <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
                   <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
                 </svg>
@@ -72,21 +60,12 @@ function createEventTemplate(point, allOffers, destination) {
   );
 }
 
-/**
- * Класс представления события
- * @type {EventView}
- * @prop {object} point Объект точки
- * @prop {object} offers Объект офферов
- * @prop {object} destination Объект места назначения
- * @prop {function} onClick Обработчик клика на карточку точки
- */
-
 export default class EventView extends AbstractView {
   #point = null;
   #offers = null;
   #destination = null;
   #onClick = null;
-  #onClickFavorite = null
+  #onClickFavorite = null;
 
   constructor({point, offers, destination, onClick, onClickFavorite}) {
     super();
@@ -112,5 +91,5 @@ export default class EventView extends AbstractView {
   #handleClickFavorite = (evt) => {
     evt.preventDefault();
     this.#onClickFavorite();
-  }
+  };
 }

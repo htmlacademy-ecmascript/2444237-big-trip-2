@@ -1,8 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
-/**
- *  Функция для создания разметки фильтров
- * @returns {string} Разметка фильтров
- */
+
 function createFilterTemplate(filters) {
   return (
     `<form class="trip-filters" action="#" method="get">
@@ -22,11 +19,6 @@ function createFilterTemplate(filters) {
   );
 }
 
-/**
- * Класс фильтров
- * @type {FiltersView}
- * @param {Array} filters Массив фильтров
- */
 export default class FiltersView extends AbstractView {
   #filters = null;
 

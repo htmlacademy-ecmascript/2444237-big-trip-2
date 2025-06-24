@@ -2,10 +2,6 @@ import { humanizeDate } from '../util.js';
 import { FORM_EDIT_DATE } from '../const.js';
 import AbstractView from '../framework/view/abstract-view.js';
 
-/**
- * Рендерит список событий
- * @return {string} Разметка списка событий
- */
 const renderTypes = () => (
   `<div class="event__type-list">
       <fieldset class="event__type-group">
@@ -51,13 +47,6 @@ const renderTypes = () => (
       </div>
     </div>`
 );
-/**
- * Рендерит список офферов
- * @param {Object[]} allOffers - массив всех офферов
- * @param {number[]} pointOffers - массив офферов текущей точки
- * @param {number} pointId - id текущей точки
- * @return {string} Разметка списка офферов
- */
 
 const renderPointOffers = (allOffers, pointOffers, pointId) => {
   if(allOffers.length === 0) {
