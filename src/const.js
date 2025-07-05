@@ -10,4 +10,10 @@ const FilterType = {
   PAST: 'past',
 };
 
-export {POINT_COUNT, DATE_FORMAT, TIME_FORMAT, FORM_EDIT_DATE, FilterType};
+const SortType = {
+  DAY: 'day',
+  PRICE: 'price',
+  TIME: 'time',
+};
+
+export {POINT_COUNT, DATE_FORMAT, TIME_FORMAT, FORM_EDIT_DATE, FilterType, SortType};
