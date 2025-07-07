@@ -27,6 +27,26 @@ const filter = {
   [FilterType.PAST]: (points) => points.filter((point) => dayjs(point.dateTo).isBefore(new Date())),
 };
 
+const SortType = {
+  DAY: 'DAY',
+  PRICE: 'PRICE',
+  TIME: 'TIME',
+};
+
+function sortByDay(pointA, pointB) {
+  return dayjs(pointA.date_from).diff(dayjs(pointB.date_from));
+}
+
+function sortByPrice(pointA, pointB) {
+  return pointB.base_price - pointA.base_price;
+}
+
+function sortByTime(pointA, pointB) {
+  const durationA = dayjs(pointA.date_to).diff(dayjs(pointA.date_from), 'minute');
+  const durationB = dayjs(pointB.date_to).diff(dayjs(pointB.date_from), 'minute');
+  return durationB - durationA;
+}
+
 function humanizeDate(date, format = DATE_FORMAT) {
   return dayjs(date).format(format);
 }
@@ -34,4 +54,5 @@ function humanizeDate(date, format = DATE_FORMAT) {
 function updateItem (items, update) {
   return items.map((item) => item.id === update.id ? update : item);
 }
-export { getRandomPointArray, getDuration, humanizeDate, filter, updateItem };
+
+export { getRandomPointArray, getDuration, humanizeDate, filter, updateItem, SortType, sortByDay, sortByPrice, sortByTime };
