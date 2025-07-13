@@ -71,7 +71,7 @@ export default class BoardPresenter {
         this.#boardPoints.sort(sortByPrice);
         break;
       default:
-        this.#boardPoints = [...this.#sourcedBoardPoints];
+        throw new Error(`Unknown sort type: ${sortType}`);
     }
     this.#currentSortType = sortType;
   }
@@ -92,7 +92,8 @@ export default class BoardPresenter {
 
   #renderSort () {
     this.#sortView = new SortView({
-      onSortTypeChange: this.#handleSortTypeChange
+      onSortTypeChange: this.#handleSortTypeChange,
+      currentSortType: this.#currentSortType
     });
 
     render(this.#sortView, this.#container, RenderPosition.AFTERBEGIN);
@@ -101,7 +102,6 @@ export default class BoardPresenter {
   #handlePointChange = (updatePoint) => {
     this.#boardPoints = updateItem(this.#boardPoints, updatePoint);
     this.#sourcedBoardPoints = updateItem(this.#sourcedBoardPoints, updatePoint);
-
     const offerByType = this.#pointsModel.getOfferByType(updatePoint.type);
     this.#pointPresenters.get(updatePoint.id).init(updatePoint, offerByType);
   };

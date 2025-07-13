@@ -36,6 +36,10 @@ export class PointModel {
   getOfferByType(type) {
     const offers = this.getOffers();
 
+    if(!offers.find((offer) => offer.type === type)) {
+      return [];
+    }
+
     return offers.find((offer) => offer.type === type).offers;
   }
 

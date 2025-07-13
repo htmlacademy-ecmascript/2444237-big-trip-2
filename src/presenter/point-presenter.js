@@ -43,7 +43,9 @@ export default class PointPresenter {
       points: this.#point,
       offers: offerByType ? offerByType : [],
       destination: this.#pointsModel.getDestinationById(this.#point.destination),
+      destinations: this.#pointsModel.getDestination(),
       onFormSubmit: () => this.#handleClickFormSubmit(),
+      getOfferByType: (type) => this.#pointsModel.getOfferByType(type)
     });
 
     if (prevPointComponent === null || prevFormEditComponent === null) {
@@ -70,6 +72,7 @@ export default class PointPresenter {
 
   reset () {
     if (this.#mode !== Mode.DEFAULT) {
+      this.#pointEditComponent.reset(this.#point);
       this.#replaceEditFormToPoint();
     }
   }
@@ -88,6 +91,7 @@ export default class PointPresenter {
   #escKeyDownHandler = (evt) => {
     if (evt.key === 'Escape') {
       evt.preventDefault();
+      this.#pointEditComponent.reset(this.#point);
       this.#handleClickFormSubmit();
     }
   };
