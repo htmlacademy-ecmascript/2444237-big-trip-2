@@ -40,7 +40,7 @@ export default class PointPresenter {
     });
 
     this.#pointEditComponent = new FormEditView({
-      points: this.#point,
+      point: this.#point,
       offers: offerByType ? offerByType : [],
       destination: this.#pointsModel.getDestinationById(this.#point.destination),
       destinations: this.#pointsModel.getDestination(),
