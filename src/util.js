@@ -28,10 +28,12 @@ const filter = {
 };
 
 const SortType = {
-  DAY: 'DAY',
-  PRICE: 'PRICE',
-  TIME: 'TIME',
+  DAY: 'day',
+  PRICE: 'price',
+  TIME: 'time',
 };
+
+const TypePoint = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
 
 function sortByDay(pointA, pointB) {
   return dayjs(pointA.date_from).diff(dayjs(pointB.date_from));
@@ -55,4 +57,4 @@ function updateItem (items, update) {
   return items.map((item) => item.id === update.id ? update : item);
 }
 
-export { getRandomPointArray, getDuration, humanizeDate, filter, updateItem, SortType, sortByDay, sortByPrice, sortByTime };
+export { getRandomPointArray, getDuration, humanizeDate, filter, updateItem, SortType, sortByDay, sortByPrice, sortByTime, TypePoint};
