@@ -1,7 +1,9 @@
 import { humanizeDate, TypePoint } from '../util.js';
 import { FORM_EDIT_DATE } from '../const.js';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
+import flatpickr from 'flatpickr';
 
+import 'flatpickr/dist/flatpickr.min.css';
 
 const renderTypes = (pointType) => (
   `<div class="event__type-list">
@@ -113,6 +115,7 @@ export default class FormEditView extends AbstractStatefulView {
   #destination = null;
   #onFormSubmit = null;
   #getOfferByType = null;
+  #flatpickr = null;
 
   constructor({point, offers, destination, destinations, onFormSubmit, getOfferByType}) {
     super();
@@ -135,8 +138,16 @@ export default class FormEditView extends AbstractStatefulView {
     this.element.querySelector('.event__type-group').addEventListener('change', this.#typeClickHandler);
     this.element.querySelector('.event__input--price').addEventListener('change', this.#priceChangeHandler);
     this.element.querySelector('.event__input--destination').addEventListener('change', this.#destinationChangeHandler);
+    const availableOffers = this.element.querySelector('.event__available-offers') || '';
+    if(availableOffers === '') {
+      return;
+    }
+    availableOffers.addEventListener('change', this.#offerChangeHandler);
+    this.element.querySelector('.event__input--time').addEventListener('change', this.#dateChangeHandler);
     this.element.querySelector('.event__available-offers').addEventListener('change', this.#offerChangeHandler);
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#handleClickFormClose);
+
+    this.#setFlitpicker();
   }
 
   #typeClickHandler = (evt) => {
@@ -172,6 +183,13 @@ export default class FormEditView extends AbstractStatefulView {
     });
   };
 
+  #dateChangeHandler = (userDate) => {
+    this.updateElement({
+      'date_from': userDate[0],
+      'date_to': userDate[1]
+    });
+  };
+
   #destinationChangeHandler = (evt) => {
     if (evt.target.value === '') {
       return;
@@ -183,8 +201,31 @@ export default class FormEditView extends AbstractStatefulView {
     });
   };
 
+
+  #setFlitpicker = () => {
+    this.#flatpickr = flatpickr(
+      this.element.querySelector('.event__field-group--time'),
+      {
+        mode: 'range',
+        enableTime: true,
+        dateFormat: 'd/m/y H:i',
+        defaultDate: [this._state.date_from, this._state.date_to],
+        onChange: this.#dateChangeHandler
+      }
+    );
+  };
+
   reset(point) {
     this._setState(FormEditView.parsePointToState(point));
+  }
+
+  removeElement() {
+    super.removeElement();
+
+    if (this.#flatpickr) {
+      this.#flatpickr.destroy();
+      this.#flatpickr = null;
+    }
   }
 
   static parsePointToState(point) {
