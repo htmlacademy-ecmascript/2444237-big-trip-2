@@ -138,16 +138,15 @@ export default class FormEditView extends AbstractStatefulView {
     this.element.querySelector('.event__type-group').addEventListener('change', this.#typeClickHandler);
     this.element.querySelector('.event__input--price').addEventListener('change', this.#priceChangeHandler);
     this.element.querySelector('.event__input--destination').addEventListener('change', this.#destinationChangeHandler);
-    const availableOffers = this.element.querySelector('.event__available-offers') || '';
-    if(availableOffers === '') {
-      return;
-    }
-    availableOffers.addEventListener('change', this.#offerChangeHandler);
-    this.element.querySelector('.event__input--time').addEventListener('change', this.#dateChangeHandler);
-    this.element.querySelector('.event__available-offers').addEventListener('change', this.#offerChangeHandler);
-    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#handleClickFormClose);
 
-    this.#setFlitpicker();
+    const availableOffers = this.element.querySelector('.event__available-offers');
+    if (availableOffers) {
+      availableOffers.addEventListener('change', this.#offerChangeHandler);
+    }
+
+    this.element.querySelector('.event__input--time').addEventListener('change', this.#dateChangeHandler);
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#handleClickFormClose);
+    this.#setFlatpicker();
   }
 
   #typeClickHandler = (evt) => {
@@ -202,14 +201,15 @@ export default class FormEditView extends AbstractStatefulView {
   };
 
 
-  #setFlitpicker = () => {
+  #setFlatpicker = () => {
+    const defaultDate = (this._state.date_from !== this._state.date_to) ? [this._state.date_from, this._state.date_to] : [this._state.date_from];
     this.#flatpickr = flatpickr(
       this.element.querySelector('.event__field-group--time'),
       {
         mode: 'range',
         enableTime: true,
         dateFormat: 'd/m/y H:i',
-        defaultDate: [this._state.date_from, this._state.date_to],
+        defaultDate: defaultDate,
         onChange: this.#dateChangeHandler
       }
     );
