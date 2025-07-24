@@ -1,6 +1,7 @@
 import { replace, render, remove } from '../framework/render';
 import EventView from '../view/point-view';
 import FormEditView from '../view/form-edit-view';
+import { UserAction, UpdateType } from '../util';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -25,7 +26,7 @@ export default class PointPresenter {
     this.#handleModeChange = onModeChange;
   }
 
-  init (point, offerByType) {
+  init (point) {
     this.#point = point;
 
     const prevPointComponent = this.#pointComponent;
@@ -33,19 +34,20 @@ export default class PointPresenter {
 
     this.#pointComponent = new EventView({
       point: this.#point,
-      offers: offerByType ? offerByType : [],
+      offers: this.#pointsModel.getOfferByType(this.#point.type),
       destination: this.#pointsModel.getDestinationById(this.#point.destination),
       onClick: () => this.#handleClickFormEdit(),
-      onClickFavorite: () => this.#handleClickFavorite()
+      onClickDelete: () => this.#handleDeleteClick()
     });
 
     this.#pointEditComponent = new FormEditView({
       point: this.#point,
-      offers: offerByType ? offerByType : [],
+      offers: this.#pointsModel.getOfferByType(this.#point.type),
       destination: this.#pointsModel.getDestinationById(this.#point.destination),
       destinations: this.#pointsModel.getDestination(),
       onFormSubmit: () => this.#handleClickFormSubmit(),
-      getOfferByType: (type) => this.#pointsModel.getOfferByType(type)
+      getOfferByType: (type) => this.#pointsModel.getOfferByType(type),
+      onFormDelete: () => this.#handleClickFormEdit()
     });
 
     if (prevPointComponent === null || prevFormEditComponent === null) {
@@ -102,16 +104,31 @@ export default class PointPresenter {
   };
 
   #handleClickFormSubmit = () => {
-    this.#handleDataChange(this.#point);
+    this.#handleDataChange(
+      UserAction.UPDATE_POINT,
+      UpdateType.MINOR,
+      this.#point
+    );
     this.#replaceEditFormToPoint();
     document.removeEventListener('keydown', this.#escKeyDownHandler);
   };
 
+  #handleDeleteClick = (task) => {
+    this.#handleDataChange(
+      UserAction.DELETE_POINT,
+      UpdateType.MINOR,
+      task,
+    );
+  };
+
   #handleClickFavorite = () => {
-    this.#handleDataChange({
-      ...this.#point,
-      'is_favorite': !this.#point.is_favorite
-    });
+    this.#handleDataChange(
+      UserAction.UPDATE_POINT,
+      UpdateType.MINOR,
+      {
+        ...this.#point,
+        'is_favorite': !this.#point.is_favorite
+      });
   };
 
 }

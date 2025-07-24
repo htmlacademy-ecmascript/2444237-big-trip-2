@@ -116,14 +116,17 @@ export default class FormEditView extends AbstractStatefulView {
   #onFormSubmit = null;
   #getOfferByType = null;
   #flatpickr = null;
+  #onPointDelete = null;
 
-  constructor({point, offers, destination, destinations, onFormSubmit, getOfferByType}) {
+  constructor({point, offers, destination, destinations, onFormSubmit, getOfferByType, onFormDelete}) {
     super();
     this.#offers = offers;
     this.#destination = destination;
     this.#destinations = destinations;
     this.#onFormSubmit = onFormSubmit;
     this.#getOfferByType = getOfferByType;
+    this.#onPointDelete = onFormDelete;
+
     this._setState(FormEditView.parsePointToState(point));
 
     this._restoreHandlers();
@@ -139,6 +142,7 @@ export default class FormEditView extends AbstractStatefulView {
     this.element.querySelector('.event__input--price').addEventListener('change', this.#priceChangeHandler);
     this.element.querySelector('.event__input--destination').addEventListener('change', this.#destinationChangeHandler);
 
+
     const availableOffers = this.element.querySelector('.event__available-offers');
     if (availableOffers) {
       availableOffers.addEventListener('change', this.#offerChangeHandler);
@@ -146,6 +150,7 @@ export default class FormEditView extends AbstractStatefulView {
 
     this.element.querySelector('.event__input--time').addEventListener('change', this.#dateChangeHandler);
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#handleClickFormClose);
+    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#handleClickPointDelete);
     this.#setFlatpicker();
   }
 
@@ -165,6 +170,11 @@ export default class FormEditView extends AbstractStatefulView {
   #handleFormSubmit = (evt) => {
     evt.preventDefault();
     this.#onFormSubmit(FormEditView.parseStateToPoint(this._state));
+  };
+
+  #handleClickPointDelete = (evt) => {
+    evt.preventDefault();
+    this.#onPointDelete(FormEditView.parseStateToPoint(this._state));
   };
 
   #handleClickFormClose = () => {

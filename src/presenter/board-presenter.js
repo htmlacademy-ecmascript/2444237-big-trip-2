@@ -1,94 +1,90 @@
-import { render, RenderPosition} from '../framework/render.js';
+import { remove, render, RenderPosition} from '../framework/render.js';
 import EventListView from '../view/event-list-view.js';
 import SortView from '../view/sort-view.js';
 import FailedDataView from '../view/failed-data.js';
 import PointPresenter from './point-presenter.js';
-import { updateItem } from '../util.js';
-import { SortType, sortByDay, sortByPrice, sortByTime } from '../util.js';
+import { SortType, sortByDay, sortByPrice, sortByTime, filter, UpdateType, UserAction } from '../util.js';
+
 
 export default class BoardPresenter {
   #container = null;
   #pointsModel = null;
   #fieldComponent = null;
   #pointPresenters = new Map();
-  #boardPoints = null;
   eventListView = new EventListView();
   #sortView = null;
   #currentSortType = SortType.DAY;
-  #sourcedBoardPoints = [];
+  #filterModel = null;
+  #filterType = null;
 
-  constructor(container, pointsModel) {
+  constructor(container, pointsModel, filterModel) {
     this.#container = container;
     this.#pointsModel = pointsModel;
+    this.#filterModel = filterModel;
+
+    this.#pointsModel.addObserver(this.#handleModelEvent);
+    this.#filterModel.addObserver(this.#handleModelEvent);
+  }
+
+  get points() {
+    this.#filterType = this.#filterModel.filter;
+    const points = this.#pointsModel.points;
+    const filteredPoints = filter[this.#filterType](points);
+    switch(this.#currentSortType) {
+      case SortType.DAY:
+        filteredPoints.sort(sortByDay);
+        break;
+      case SortType.TIME:
+        filteredPoints.sort(sortByTime);
+        break;
+      case SortType.PRICE:
+        filteredPoints.sort(sortByPrice);
+        break;
+    }
+    return filteredPoints;
   }
 
   init () {
-    this.#boardPoints = [...this.#pointsModel.getPoint()];
-    this.#sourcedBoardPoints = [...this.#pointsModel.getPoint()];
-    this.#sortPoints(this.#currentSortType);
 
+    this.#renderBoard();
 
-    if (this.#boardPoints.length === 0) {
-      this.#renderFailedData();
-      return;
-    }
-    render(this.eventListView, this.#container);
     this.#renderSort();
 
-
-    for (let i = 0; i < this.#boardPoints.length; i++) {
-      const offerByType = this.#pointsModel.getOfferByType(this.#boardPoints[i].type);
-      this.#renderEvent(this.#boardPoints[i], offerByType);
-    }
   }
 
   #renderFailedData() {
-    this.#fieldComponent = new FailedDataView();
+    this.#fieldComponent = new FailedDataView({
+      filterType: this.#filterType
+    });
     render(this.#fieldComponent, this.#container);
   }
 
-  #renderEvent (event, offerByType) {
+  #renderEvent (event) {
     const pointPresenter = new PointPresenter({
       pointListContainer: this.eventListView.element,
       pointsModel: this.#pointsModel,
-      onDataChange: this.#handlePointChange,
+      onDataChange: this.#handleViewAction,
       onModeChange: this.#handleModeChange
     });
 
-    pointPresenter.init(event, offerByType);
+    pointPresenter.init(event);
     this.#pointPresenters.set(event.id, pointPresenter);
-  }
-
-  #sortPoints (sortType) {
-    switch(sortType) {
-      case SortType.DAY:
-        this.#boardPoints.sort(sortByDay);
-        break;
-      case SortType.TIME:
-        this.#boardPoints.sort(sortByTime);
-        break;
-      case SortType.PRICE:
-        this.#boardPoints.sort(sortByPrice);
-        break;
-      default:
-        throw new Error(`Unknown sort type: ${sortType}`);
-    }
-    this.#currentSortType = sortType;
   }
 
   #handleSortTypeChange = (sortType) => {
     if (this.#currentSortType === sortType) {
       return;
     }
-
-    this.#sortPoints(sortType);
+    this.#currentSortType = sortType;
     this.#clearPointList();
-    for (let i = 0; i < this.#boardPoints.length; i++) {
-      const offerByType = this.#pointsModel.getOfferByType(this.#boardPoints[i].type);
-      this.#renderEvent(this.#boardPoints[i], offerByType);
-    }
-
+    this.#renderPoints();
   };
+
+  #renderPoints () {
+    this.points.forEach((point) => {
+      this.#renderEvent(point);
+    });
+  }
 
   #renderSort () {
     this.#sortView = new SortView({
@@ -99,9 +95,37 @@ export default class BoardPresenter {
     render(this.#sortView, this.#container, RenderPosition.AFTERBEGIN);
   }
 
+  #handleViewAction = (actionType, updateType, update) => {
+    switch (actionType) {
+      case UserAction.UPDATE_POINT:
+        this.#pointsModel.updatePoint(updateType, update);
+        break;
+      case UserAction.ADD_POINT:
+        this.#pointsModel.addPoint(updateType, update);
+        break;
+      case UserAction.DELETE_POINT:
+        this.#pointsModel.deletePoint(updateType, update);
+        break;
+    }
+  };
+
+  #handleModelEvent = (updateType, data) => {
+    switch (updateType) {
+      case UpdateType.PATCH:
+        this.#pointPresenters.get(data.id).init(data);
+        break;
+      case UpdateType.MINOR:
+        this.#clearPointList();
+        this.#renderBoard();
+        break;
+      case UpdateType.MAJOR:
+        this.#clearPointList({resetSortType: true});
+        this.#renderBoard();
+        break;
+    }
+  };
+
   #handlePointChange = (updatePoint) => {
-    this.#boardPoints = updateItem(this.#boardPoints, updatePoint);
-    this.#sourcedBoardPoints = updateItem(this.#sourcedBoardPoints, updatePoint);
     const offerByType = this.#pointsModel.getOfferByType(updatePoint.type);
     this.#pointPresenters.get(updatePoint.id).init(updatePoint, offerByType);
   };
@@ -110,9 +134,27 @@ export default class BoardPresenter {
     this.#pointPresenters.forEach((presenter) => presenter.reset());
   };
 
-  #clearPointList() {
+  #clearPointList({resetSortType = false} = {}) {
     this.#pointPresenters.forEach((presenter) => presenter.destroy());
     this.#pointPresenters.clear();
     this.eventListView.element.innerHTML = '';
+    remove(this.#fieldComponent);
+    remove(this.eventListView);
+
+    if (resetSortType) {
+      this.#currentSortType = SortType.DAY;
+    }
+  }
+
+  #renderBoard() {
+    render(this.eventListView, this.#container);
+
+    const points = this.points;
+    if (points.length === 0) {
+      this.#renderFailedData();
+      return;
+    }
+
+    this.#renderPoints();
   }
 }
