@@ -33,6 +33,25 @@ const SortType = {
   TIME: 'time',
 };
 
+const UserAction = {
+  UPDATE_POINT: 'UPDATE_POINT',
+  ADD_POINT: 'ADD_POINT',
+  DELETE_POINT: 'DELETE_POINT',
+};
+
+const NoPointsTextType = {
+  [FilterType.EVERYTHING]: 'Click New Event to create your first point',
+  [FilterType.FUTURE]: 'There are no future events now',
+  [FilterType.PRESENT]: 'There are no present events now',
+  [FilterType.PAST]: 'There are no past events now',
+};
+
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};
+
 const TypePoint = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
 
 function sortByDay(pointA, pointB) {
@@ -57,4 +76,4 @@ function updateItem (items, update) {
   return items.map((item) => item.id === update.id ? update : item);
 }
 
-export { getRandomPointArray, getDuration, humanizeDate, filter, updateItem, SortType, sortByDay, sortByPrice, sortByTime, TypePoint};
+export { getRandomPointArray, getDuration, humanizeDate, filter, updateItem, SortType, sortByDay, sortByPrice, sortByTime, TypePoint, UserAction, UpdateType, NoPointsTextType};
