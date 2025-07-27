@@ -1,4 +1,4 @@
-import { remove, render, RenderPosition} from '../framework/render.js';
+import { render, RenderPosition} from '../framework/render.js';
 import EventListView from '../view/event-list-view.js';
 import SortView from '../view/sort-view.js';
 import FailedDataView from '../view/failed-data.js';
@@ -125,10 +125,10 @@ export default class BoardPresenter {
     }
   };
 
-  #handlePointChange = (updatePoint) => {
-    const offerByType = this.#pointsModel.getOfferByType(updatePoint.type);
-    this.#pointPresenters.get(updatePoint.id).init(updatePoint, offerByType);
-  };
+  // #handlePointChange = (updatePoint) => {
+  //   const offerByType = this.#pointsModel.getOfferByType(updatePoint.type);
+  //   this.#pointPresenters.get(updatePoint.id).init(updatePoint, offerByType);
+  // };
 
   #handleModeChange = () => {
     this.#pointPresenters.forEach((presenter) => presenter.reset());
@@ -137,9 +137,6 @@ export default class BoardPresenter {
   #clearPointList({resetSortType = false} = {}) {
     this.#pointPresenters.forEach((presenter) => presenter.destroy());
     this.#pointPresenters.clear();
-    this.eventListView.element.innerHTML = '';
-    remove(this.#fieldComponent);
-    remove(this.eventListView);
 
     if (resetSortType) {
       this.#currentSortType = SortType.DAY;

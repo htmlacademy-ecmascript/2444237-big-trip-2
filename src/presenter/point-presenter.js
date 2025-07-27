@@ -36,8 +36,8 @@ export default class PointPresenter {
       point: this.#point,
       offers: this.#pointsModel.getOfferByType(this.#point.type),
       destination: this.#pointsModel.getDestinationById(this.#point.destination),
-      onClick: () => this.#handleClickFormEdit(),
-      onClickDelete: () => this.#handleDeleteClick()
+      onClick: this.#handleClickFormEdit,
+      onClickFavorite: this.#handleClickFavorite
     });
 
     this.#pointEditComponent = new FormEditView({
@@ -45,9 +45,10 @@ export default class PointPresenter {
       offers: this.#pointsModel.getOfferByType(this.#point.type),
       destination: this.#pointsModel.getDestinationById(this.#point.destination),
       destinations: this.#pointsModel.getDestination(),
-      onFormSubmit: () => this.#handleClickFormSubmit(),
+      onFormSubmit: this.#handleClickFormSubmit,
+      onClickFormClose: this.#handleClickFormClose,
+      onPointDelete: this.#handleDeleteClick,
       getOfferByType: (type) => this.#pointsModel.getOfferByType(type),
-      onFormDelete: () => this.#handleClickFormEdit()
     });
 
     if (prevPointComponent === null || prevFormEditComponent === null) {
@@ -103,28 +104,33 @@ export default class PointPresenter {
     document.addEventListener('keydown', this.#escKeyDownHandler);
   };
 
-  #handleClickFormSubmit = () => {
+  #handleClickFormClose = () => {
+    this.#replaceEditFormToPoint();
+    document.removeEventListener('keydown', this.#escKeyDownHandler);
+  };
+
+  #handleClickFormSubmit = (newPoint) => {
     this.#handleDataChange(
       UserAction.UPDATE_POINT,
       UpdateType.MINOR,
-      this.#point
+      newPoint
     );
     this.#replaceEditFormToPoint();
     document.removeEventListener('keydown', this.#escKeyDownHandler);
   };
 
-  #handleDeleteClick = (task) => {
+  #handleDeleteClick = (deletePoint) => {
     this.#handleDataChange(
       UserAction.DELETE_POINT,
       UpdateType.MINOR,
-      task,
+      deletePoint,
     );
   };
 
   #handleClickFavorite = () => {
     this.#handleDataChange(
       UserAction.UPDATE_POINT,
-      UpdateType.MINOR,
+      UpdateType.PATCH,
       {
         ...this.#point,
         'is_favorite': !this.#point.is_favorite

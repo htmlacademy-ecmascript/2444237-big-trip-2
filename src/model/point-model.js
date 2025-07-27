@@ -6,47 +6,31 @@ import Observable from '../framework/observable.js';
 
 
 export class PointModel extends Observable {
-  #point = Array.from({length: POINT_COUNT}, getRandomPoint);
+  #points = Array.from({length: POINT_COUNT}, getRandomPoint);
   #offers = offersMock;
   #destination = destinationMock;
 
   get points() {
-    return this.#point;
+    return this.#points;
   }
 
   updatePoint(updateType, update) {
-    const index = this.#point.findIndex((point) => point.id === update.id);
-    if (index === -1) {
-      throw new Error('Can\'t update unexisting point');
-    }
-
-    this.#point = [
-      ...this.#point.slice(0, index),
-      update,
-      ...this.#point.slice(index + 1)];
+    this.#points = this.#points.map((point) => point.id === update.id ? update : point);
 
     this._notify(updateType, update);
   }
 
   addPoint(updateType, update) {
-    this.#point = [
+    this.#points = [
       update,
-      ...this.#point
+      ...this.#points
     ];
 
     this._notify(updateType, update);
   }
 
   deletePoint(updateType, update) {
-    const index = this.points.findIndex((point) => point.id === update.id);
-    if (index === -1) {
-      throw new Error('Can\'t delete unexisting point');
-    }
-
-    this.#point = [
-      ...this.#point.slice(0, index),
-      ...this.#point.slice(index + 1)
-    ];
+    this.#points = this.#points.filter((point) => point.id !== update.id);
 
     this._notify(updateType);
   }

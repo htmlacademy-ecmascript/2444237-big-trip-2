@@ -16,7 +16,7 @@ class FailedDataView extends AbstractView {
   }
 
   get template() {
-    return createFailedDataTemplate();
+    return createFailedDataTemplate(this.#filterType);
   }
 }
 

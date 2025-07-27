@@ -1,3 +1,4 @@
+/* eslint-disable indent */
 import { humanizeDate, TypePoint } from '../util.js';
 import { FORM_EDIT_DATE } from '../const.js';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
@@ -36,12 +37,12 @@ const renderPointOffers = (allOffers, pointOffers, pointId) => {
         `<div class="event__offer-selector">
               <input
                 class="event__offer-checkbox visually-hidden"
-                id="event-offer-${offer.id}-${pointId}"
+                id="event_offer_${offer.id}_${pointId}"
                 type="checkbox"
-                name="event-offer-${offer.id}"
+                name="event_offer_${offer.id}"
                   ${isChecked ? 'checked' : ''}
                 >
-                <label class="event__offer-label" for="event-offer-${offer.id}-${pointId}">
+                <label class="event__offer-label" for="event_offer_${offer.id}_${pointId}">
                     <span class="event__offer-title">${offer.title}</span>
                     &plus;&euro;&nbsp;
                     <span class="event__offer-price">${offer.price}</span>
@@ -103,6 +104,14 @@ function createFormEditTemplate(point, destinations, getOfferByType) {
             <section class="event__section  event__section--destination">
               <h3 class="event__section-title  event__section-title--destination">Destination</h3>
               <p class="event__destination-description">${pointDestination?.description || ''}</p>
+                <div class="event__photos-container">
+                      <div class="event__photos-tape">
+                          ${pointDestination?.pictures.map((picture) =>
+                           `<img class="event__photo"
+                                src="${picture.src}"
+                                alt="${picture.description}">`).join('') || ''}
+                      </div>
+                    </div>
             </section>
         </section>
     </form>`
@@ -116,16 +125,20 @@ export default class FormEditView extends AbstractStatefulView {
   #onFormSubmit = null;
   #getOfferByType = null;
   #flatpickr = null;
+  #onClickFormClose = null;
   #onPointDelete = null;
 
-  constructor({point, offers, destination, destinations, onFormSubmit, getOfferByType, onFormDelete}) {
+
+  constructor({point, offers, destination, destinations, onFormSubmit, onClickFormClose, onPointDelete ,getOfferByType}) {
     super();
     this.#offers = offers;
     this.#destination = destination;
     this.#destinations = destinations;
     this.#onFormSubmit = onFormSubmit;
     this.#getOfferByType = getOfferByType;
-    this.#onPointDelete = onFormDelete;
+    this.#onClickFormClose = onClickFormClose;
+    this.#onPointDelete = onPointDelete;
+
 
     this._setState(FormEditView.parsePointToState(point));
 
@@ -174,19 +187,19 @@ export default class FormEditView extends AbstractStatefulView {
 
   #handleClickPointDelete = (evt) => {
     evt.preventDefault();
-    this.#onPointDelete(FormEditView.parseStateToPoint(this._state));
+    this.#onPointDelete(this._state);
   };
 
   #handleClickFormClose = () => {
-    this.#onFormSubmit(null);
     this.reset(this._state);
+    this.#onClickFormClose();
   };
 
   #offerChangeHandler = (evt) => {
+    const [, , offerId] = evt.target.id.split('_');
     const newCheckBoxes = evt.target.checked
-      ? [...this._state.offers, evt.target.id]
-      : this._state.offers.filter((id) => id !== evt.target.id);
-
+      ? [...this._state.offers, offerId]
+      : this._state.offers.filter((id) => id !== offerId);
     this._setState({
       offers: newCheckBoxes
     });
