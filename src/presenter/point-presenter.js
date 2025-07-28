@@ -3,6 +3,7 @@ import EventView from '../view/point-view';
 import FormEditView from '../view/form-edit-view';
 import { UserAction, UpdateType } from '../util';
 
+
 const Mode = {
   DEFAULT: 'DEFAULT',
   EDITING: 'EDITING',
@@ -42,13 +43,12 @@ export default class PointPresenter {
 
     this.#pointEditComponent = new FormEditView({
       point: this.#point,
-      offers: this.#pointsModel.getOfferByType(this.#point.type),
-      destination: this.#pointsModel.getDestinationById(this.#point.destination),
       destinations: this.#pointsModel.getDestination(),
       onFormSubmit: this.#handleClickFormSubmit,
       onClickFormClose: this.#handleClickFormClose,
       onPointDelete: this.#handleDeleteClick,
       getOfferByType: (type) => this.#pointsModel.getOfferByType(type),
+      isFormEdit: true,
     });
 
     if (prevPointComponent === null || prevFormEditComponent === null) {

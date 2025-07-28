@@ -1,10 +1,16 @@
-/* eslint-disable indent */
 import { humanizeDate, TypePoint } from '../util.js';
 import { FORM_EDIT_DATE } from '../const.js';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import flatpickr from 'flatpickr';
 
 import 'flatpickr/dist/flatpickr.min.css';
+
+const EMPTY_POINT = {
+  'base_price': 1000,
+  'is_favorite': false,
+  'offers': [],
+  'type': 'flight'
+};
 
 const renderTypes = (pointType) => (
   `<div class="event__type-list">
@@ -19,7 +25,25 @@ const renderTypes = (pointType) => (
       </div>
     </div>`
 );
+const renderButtonsFormEdit = (isEditForm) => {
+  if (isEditForm) {
+    return (
+      `<button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
+          <button class="event__reset-btn" type="reset">Delete</button>
+          <button class="event__rollup-btn" type="button">
+              <span class="visually-hidden">Open event</span>
+          </button>
+      `);
+  }
 
+  return (
+    `<button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
+     <button class="event__reset-btn" type="reset">Cancel</button>
+        <button class="event__rollup-btn" type="button">
+            <span class="visually-hidden">Open event</span>
+        </button>
+    `);
+};
 const renderPointOffers = (allOffers, pointOffers, pointId) => {
   if(allOffers.length === 0) {
     return '';
@@ -53,8 +77,8 @@ const renderPointOffers = (allOffers, pointOffers, pointId) => {
   </section>`);
 };
 
-function createFormEditTemplate(point, destinations, getOfferByType) {
-  const offerByType = getOfferByType(point.type) || [];
+function createFormEditTemplate(point, destinations, getOfferByType, isFormEdit) {
+  const offerByType = getOfferByType(point.type || defaultPointType) || [];
   const pointDestination = destinations.find((element) => element.id === point.destination);
   return (
     `<form class="event event--edit" action="#" method="post">
@@ -92,12 +116,7 @@ function createFormEditTemplate(point, destinations, getOfferByType) {
               </label>
               <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${point.base_price}">
             </div>
-
-            <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-            <button class="event__reset-btn" type="reset">Delete</button>
-            <button class="event__rollup-btn" type="button">
-              <span class="visually-hidden">Open event</span>
-            </button>
+              ${renderButtonsFormEdit(isFormEdit)}
         </header>
         <section class="event__details">
             ${renderPointOffers(offerByType, point.offers, point.id)}
@@ -107,7 +126,7 @@ function createFormEditTemplate(point, destinations, getOfferByType) {
                 <div class="event__photos-container">
                       <div class="event__photos-tape">
                           ${pointDestination?.pictures.map((picture) =>
-                           `<img class="event__photo"
+      `<img class="event__photo"
                                 src="${picture.src}"
                                 alt="${picture.description}">`).join('') || ''}
                       </div>
@@ -119,25 +138,23 @@ function createFormEditTemplate(point, destinations, getOfferByType) {
 }
 
 export default class FormEditView extends AbstractStatefulView {
-  #offers = null;
   #destinations = null;
-  #destination = null;
   #onFormSubmit = null;
   #getOfferByType = null;
   #flatpickr = null;
   #onClickFormClose = null;
   #onPointDelete = null;
+  #isFormEdit = null;
 
 
-  constructor({point, offers, destination, destinations, onFormSubmit, onClickFormClose, onPointDelete ,getOfferByType}) {
+  constructor({point = EMPTY_POINT, destinations, onFormSubmit, onClickFormClose, onPointDelete ,getOfferByType, isFormEdit = true}) {
     super();
-    this.#offers = offers;
-    this.#destination = destination;
     this.#destinations = destinations;
     this.#onFormSubmit = onFormSubmit;
     this.#getOfferByType = getOfferByType;
     this.#onClickFormClose = onClickFormClose;
     this.#onPointDelete = onPointDelete;
+    this.#isFormEdit = isFormEdit;
 
 
     this._setState(FormEditView.parsePointToState(point));
@@ -146,7 +163,7 @@ export default class FormEditView extends AbstractStatefulView {
   }
 
   get template() {
-    return createFormEditTemplate(this._state, this.#destinations, this.#getOfferByType);
+    return createFormEditTemplate(this._state, this.#destinations, this.#getOfferByType, this.#isFormEdit);
   }
 
   _restoreHandlers() {

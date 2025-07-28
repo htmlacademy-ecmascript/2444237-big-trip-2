@@ -1,9 +1,11 @@
 import { render, RenderPosition} from '../framework/render.js';
 import EventListView from '../view/event-list-view.js';
 import SortView from '../view/sort-view.js';
+import NewPointPresenter from './new-point-presenter.js';
 import FailedDataView from '../view/failed-data.js';
 import PointPresenter from './point-presenter.js';
-import { SortType, sortByDay, sortByPrice, sortByTime, filter, UpdateType, UserAction } from '../util.js';
+import { SortType, sortByDay, sortByPrice, sortByTime, filter, UpdateType, UserAction} from '../util.js';
+import { FilterType } from '../const.js';
 
 
 export default class BoardPresenter {
@@ -16,11 +18,19 @@ export default class BoardPresenter {
   #currentSortType = SortType.DAY;
   #filterModel = null;
   #filterType = null;
+  #newPointPresenter = null;
 
-  constructor(container, pointsModel, filterModel) {
+  constructor(container, pointsModel, filterModel, onNewPointDestroy) {
     this.#container = container;
     this.#pointsModel = pointsModel;
     this.#filterModel = filterModel;
+
+    this.#newPointPresenter = new NewPointPresenter({
+      taskListContainer: this.eventListView.element,
+      onDataChange: this.#handleViewAction,
+      onDataDestroy: onNewPointDestroy,
+      pointsModel: this.#pointsModel
+    });
 
     this.#pointsModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
@@ -71,6 +81,12 @@ export default class BoardPresenter {
     this.#pointPresenters.set(event.id, pointPresenter);
   }
 
+  createNewPoint (event) {
+    this.#currentSortType = SortType.DAY;
+    this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+    this.#newPointPresenter.init(event);
+  }
+
   #handleSortTypeChange = (sortType) => {
     if (this.#currentSortType === sortType) {
       return;
@@ -83,6 +99,7 @@ export default class BoardPresenter {
   #renderPoints () {
     this.points.forEach((point) => {
       this.#renderEvent(point);
+      this.createNewPoint(point);
     });
   }
 
@@ -125,18 +142,15 @@ export default class BoardPresenter {
     }
   };
 
-  // #handlePointChange = (updatePoint) => {
-  //   const offerByType = this.#pointsModel.getOfferByType(updatePoint.type);
-  //   this.#pointPresenters.get(updatePoint.id).init(updatePoint, offerByType);
-  // };
-
   #handleModeChange = () => {
+    this.#newPointPresenter.destroy();
     this.#pointPresenters.forEach((presenter) => presenter.reset());
   };
 
   #clearPointList({resetSortType = false} = {}) {
     this.#pointPresenters.forEach((presenter) => presenter.destroy());
     this.#pointPresenters.clear();
+    this.#newPointPresenter.destroy();
 
     if (resetSortType) {
       this.#currentSortType = SortType.DAY;
