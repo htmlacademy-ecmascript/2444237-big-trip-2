@@ -22,15 +22,34 @@ function getDuration(dateFrom, dateTo) {
 
 const filter = {
   [FilterType.EVERYTHING]: (points) => points,
-  [FilterType.FUTURE]: (points) => points.filter((point) => dayjs(point.dateFrom).isAfter(new Date())),
-  [FilterType.PRESENT]: (points) => points.filter((point) => dayjs(point.dateFrom).isSameOrBefore(new Date()) && dayjs(point.dateTo).isSameOrAfter(new Date())),
-  [FilterType.PAST]: (points) => points.filter((point) => dayjs(point.dateTo).isBefore(new Date())),
+  [FilterType.FUTURE]: (points) => points.filter((point) => dayjs(point.date_from).isAfter(new Date())),
+  [FilterType.PRESENT]: (points) => points.filter((point) => dayjs(point.date_from).isSameOrBefore(new Date()) && dayjs(point.date_to).isSameOrAfter(new Date())),
+  [FilterType.PAST]: (points) => points.filter((point) => dayjs(point.date_to).isBefore(new Date())),
 };
 
 const SortType = {
   DAY: 'day',
   PRICE: 'price',
   TIME: 'time',
+};
+
+const UserAction = {
+  UPDATE_POINT: 'UPDATE_POINT',
+  ADD_POINT: 'ADD_POINT',
+  DELETE_POINT: 'DELETE_POINT',
+};
+
+const NoPointsTextType = {
+  [FilterType.EVERYTHING]: 'Click New Event to create your first point',
+  [FilterType.FUTURE]: 'There are no future events now',
+  [FilterType.PRESENT]: 'There are no present events now',
+  [FilterType.PAST]: 'There are no past events now',
+};
+
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
 };
 
 const TypePoint = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
@@ -57,4 +76,4 @@ function updateItem (items, update) {
   return items.map((item) => item.id === update.id ? update : item);
 }
 
-export { getRandomPointArray, getDuration, humanizeDate, filter, updateItem, SortType, sortByDay, sortByPrice, sortByTime, TypePoint};
+export { getRandomPointArray, getDuration, humanizeDate, filter, updateItem, SortType, sortByDay, sortByPrice, sortByTime, TypePoint, UserAction, UpdateType, NoPointsTextType};

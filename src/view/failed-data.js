@@ -1,19 +1,22 @@
 import AbstractView from '../framework/view/abstract-view.js';
+import { NoPointsTextType } from '../util.js';
 
-const createFailedDataTemplate = () => (
-  `<main class="page-body__page-main  page-main">
-      <div class="page-body__container">
-          <section class="trip-events">
-              <h2 class="visually-hidden">Trip events</h2>
-              <p class="trip-events__msg">Failed to load latest route information</p>
-          </section>
-      </div>
-    </main>`
+
+const createFailedDataTemplate = (filterType) => (
+  `<p class="trip-events__msg">
+      ${NoPointsTextType[filterType]}
+  </p>`
 );
 
 class FailedDataView extends AbstractView {
+  #filterType = null;
+  constructor({filterType}) {
+    super();
+    this.#filterType = filterType;
+  }
+
   get template() {
-    return createFailedDataTemplate();
+    return createFailedDataTemplate(this.#filterType);
   }
 }
 

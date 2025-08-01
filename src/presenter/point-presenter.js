@@ -1,6 +1,8 @@
 import { replace, render, remove } from '../framework/render';
 import EventView from '../view/point-view';
 import FormEditView from '../view/form-edit-view';
+import { UserAction, UpdateType } from '../util';
+
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -25,7 +27,7 @@ export default class PointPresenter {
     this.#handleModeChange = onModeChange;
   }
 
-  init (point, offerByType) {
+  init (point) {
     this.#point = point;
 
     const prevPointComponent = this.#pointComponent;
@@ -33,19 +35,20 @@ export default class PointPresenter {
 
     this.#pointComponent = new EventView({
       point: this.#point,
-      offers: offerByType ? offerByType : [],
+      offers: this.#pointsModel.getOfferByType(this.#point.type),
       destination: this.#pointsModel.getDestinationById(this.#point.destination),
-      onClick: () => this.#handleClickFormEdit(),
-      onClickFavorite: () => this.#handleClickFavorite()
+      onClick: this.#handleClickFormEdit,
+      onClickFavorite: this.#handleClickFavorite
     });
 
     this.#pointEditComponent = new FormEditView({
       point: this.#point,
-      offers: offerByType ? offerByType : [],
-      destination: this.#pointsModel.getDestinationById(this.#point.destination),
       destinations: this.#pointsModel.getDestination(),
-      onFormSubmit: () => this.#handleClickFormSubmit(),
-      getOfferByType: (type) => this.#pointsModel.getOfferByType(type)
+      onFormSubmit: this.#handleClickFormSubmit,
+      onClickFormClose: this.#handleClickFormClose,
+      onPointDelete: this.#handleDeleteClick,
+      getOfferByType: (type) => this.#pointsModel.getOfferByType(type),
+      isFormEdit: true,
     });
 
     if (prevPointComponent === null || prevFormEditComponent === null) {
@@ -101,17 +104,37 @@ export default class PointPresenter {
     document.addEventListener('keydown', this.#escKeyDownHandler);
   };
 
-  #handleClickFormSubmit = () => {
-    this.#handleDataChange(this.#point);
+  #handleClickFormClose = () => {
     this.#replaceEditFormToPoint();
     document.removeEventListener('keydown', this.#escKeyDownHandler);
   };
 
+  #handleClickFormSubmit = (newPoint) => {
+    this.#handleDataChange(
+      UserAction.UPDATE_POINT,
+      UpdateType.MINOR,
+      newPoint
+    );
+    this.#replaceEditFormToPoint();
+    document.removeEventListener('keydown', this.#escKeyDownHandler);
+  };
+
+  #handleDeleteClick = (deletePoint) => {
+    this.#handleDataChange(
+      UserAction.DELETE_POINT,
+      UpdateType.MINOR,
+      deletePoint,
+    );
+  };
+
   #handleClickFavorite = () => {
-    this.#handleDataChange({
-      ...this.#point,
-      'is_favorite': !this.#point.is_favorite
-    });
+    this.#handleDataChange(
+      UserAction.UPDATE_POINT,
+      UpdateType.PATCH,
+      {
+        ...this.#point,
+        'is_favorite': !this.#point.is_favorite
+      });
   };
 
 }

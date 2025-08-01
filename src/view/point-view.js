@@ -20,7 +20,6 @@ const renderListOffers = (checkOffers) => {
 };
 
 function createEventTemplate(point, allOffers, destination) {
-  const { name } = destination;
   const checkOffers = point.offers.map((offer) => allOffers.find((offerAll) => offerAll.id === offer));
 
   return (
@@ -31,7 +30,7 @@ function createEventTemplate(point, allOffers, destination) {
                 <img class="event__type-icon" width="42" height="42" src="img/icons/${point.type}.png" alt="Event type icon">
               </div>
               <h3 class="event__title">
-                ${point.type} ${name}
+                ${point.type} ${destination?.name || ''}
               </h3>
               <div class="event__schedule">
                 <p class="event__time">

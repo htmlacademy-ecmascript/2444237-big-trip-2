@@ -2,15 +2,37 @@ import { POINT_COUNT } from '../const.js';
 import { getRandomPoint } from '../mock/points.js';
 import { offersMock } from '../mock/offers.js';
 import { destinationMock } from '../mock/destination.js';
+import Observable from '../framework/observable.js';
 
 
-export class PointModel {
-  #point = Array.from({length: POINT_COUNT}, getRandomPoint);
+export class PointsModel extends Observable {
+  #points = Array.from({length: POINT_COUNT}, getRandomPoint);
   #offers = offersMock;
   #destination = destinationMock;
 
-  getPoint() {
-    return this.#point;
+  get points() {
+    return this.#points;
+  }
+
+  updatePoint(updateType, update) {
+    this.#points = this.#points.map((point) => point.id === update.id ? update : point);
+
+    this._notify(updateType, update);
+  }
+
+  addPoint(updateType, update) {
+    this.#points = [
+      update,
+      ...this.#points
+    ];
+
+    this._notify(updateType, update);
+  }
+
+  deletePoint(updateType, update) {
+    this.#points = this.#points.filter((point) => point.id !== update.id);
+
+    this._notify(updateType);
   }
 
   getOffers() {
@@ -28,9 +50,9 @@ export class PointModel {
   }
 
   getPointById(id) {
-    const points = this.getPoint();
+    const points = this.points;
 
-    return points.find((point) => point === id);
+    return points.find((point) => point.id === id);
   }
 
   getOfferByType(type) {
