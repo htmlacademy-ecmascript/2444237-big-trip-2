@@ -8,7 +8,6 @@ export default class FilterPresenter {
   #filtersContainer = null;
   #filtersModel = null;
   #pointsModel = null;
-
   #filterComponent = null;
 
   constructor({filtersContainer , filtersModel, pointsModel}) {

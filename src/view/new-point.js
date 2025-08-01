@@ -19,6 +19,10 @@ class NewPointView extends AbstractView {
     evt.preventDefault();
     this.#handleClick();
   };
+
+  toggleState(newState) {
+    this.element.disabled = newState;
+  }
 }
 
 export default NewPointView;

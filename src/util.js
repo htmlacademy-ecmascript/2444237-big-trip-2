@@ -22,9 +22,9 @@ function getDuration(dateFrom, dateTo) {
 
 const filter = {
   [FilterType.EVERYTHING]: (points) => points,
-  [FilterType.FUTURE]: (points) => points.filter((point) => dayjs(point.dateFrom).isAfter(new Date())),
-  [FilterType.PRESENT]: (points) => points.filter((point) => dayjs(point.dateFrom).isSameOrBefore(new Date()) && dayjs(point.dateTo).isSameOrAfter(new Date())),
-  [FilterType.PAST]: (points) => points.filter((point) => dayjs(point.dateTo).isBefore(new Date())),
+  [FilterType.FUTURE]: (points) => points.filter((point) => dayjs(point.date_from).isAfter(new Date())),
+  [FilterType.PRESENT]: (points) => points.filter((point) => dayjs(point.date_from).isSameOrBefore(new Date()) && dayjs(point.date_to).isSameOrAfter(new Date())),
+  [FilterType.PAST]: (points) => points.filter((point) => dayjs(point.date_to).isBefore(new Date())),
 };
 
 const SortType = {

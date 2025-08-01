@@ -78,7 +78,7 @@ const renderPointOffers = (allOffers, pointOffers, pointId) => {
 };
 
 function createFormEditTemplate(point, destinations, getOfferByType, isFormEdit) {
-  const offerByType = getOfferByType(point.type || defaultPointType) || [];
+  const offerByType = getOfferByType(point.type) || [];
   const pointDestination = destinations.find((element) => element.id === point.destination);
   return (
     `<form class="event event--edit" action="#" method="post">
@@ -147,7 +147,15 @@ export default class FormEditView extends AbstractStatefulView {
   #isFormEdit = null;
 
 
-  constructor({point = EMPTY_POINT, destinations, onFormSubmit, onClickFormClose, onPointDelete ,getOfferByType, isFormEdit = true}) {
+  constructor({
+    point = EMPTY_POINT,
+    destinations,
+    onFormSubmit,
+    onClickFormClose,
+    onPointDelete,
+    getOfferByType,
+    isFormEdit = true
+  }) {
     super();
     this.#destinations = destinations;
     this.#onFormSubmit = onFormSubmit;
@@ -192,6 +200,11 @@ export default class FormEditView extends AbstractStatefulView {
   };
 
   #priceChangeHandler = (evt) => {
+    const intValue = parseInt(evt.target.value, 10);
+    if(isNaN(intValue) || intValue < 0) {
+      return;
+    }
+
     this._setState({
       'base_price': evt.target.value
     });

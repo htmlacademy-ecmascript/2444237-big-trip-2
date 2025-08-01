@@ -5,7 +5,7 @@ import { destinationMock } from '../mock/destination.js';
 import Observable from '../framework/observable.js';
 
 
-export class PointModel extends Observable {
+export class PointsModel extends Observable {
   #points = Array.from({length: POINT_COUNT}, getRandomPoint);
   #offers = offersMock;
   #destination = destinationMock;

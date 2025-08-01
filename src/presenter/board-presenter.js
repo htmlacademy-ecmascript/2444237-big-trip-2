@@ -2,6 +2,7 @@ import { render, RenderPosition} from '../framework/render.js';
 import EventListView from '../view/event-list-view.js';
 import SortView from '../view/sort-view.js';
 import NewPointPresenter from './new-point-presenter.js';
+import NewPointView from '../view/new-point.js';
 import FailedDataView from '../view/failed-data.js';
 import PointPresenter from './point-presenter.js';
 import { SortType, sortByDay, sortByPrice, sortByTime, filter, UpdateType, UserAction} from '../util.js';
@@ -19,16 +20,23 @@ export default class BoardPresenter {
   #filterModel = null;
   #filterType = null;
   #newPointPresenter = null;
+  #tripMainContainer = null;
+  #newPointComponent = null;
 
-  constructor(container, pointsModel, filterModel, onNewPointDestroy) {
+  constructor({container, pointsModel, filterModel, tripMainContainer}) {
     this.#container = container;
     this.#pointsModel = pointsModel;
     this.#filterModel = filterModel;
+    this.#tripMainContainer = tripMainContainer;
+
+    this.#newPointComponent = new NewPointView({
+      onClick: this.handleNewPointClick
+    });
 
     this.#newPointPresenter = new NewPointPresenter({
-      taskListContainer: this.eventListView.element,
+      pointListContainer: this.eventListView.element,
       onDataChange: this.#handleViewAction,
-      onDataDestroy: onNewPointDestroy,
+      onDataDestroy: this.#handleNewPointDestroy,
       pointsModel: this.#pointsModel
     });
 
@@ -55,12 +63,20 @@ export default class BoardPresenter {
   }
 
   init () {
-
     this.#renderBoard();
-
     this.#renderSort();
 
+    render(this.#newPointComponent, this.#tripMainContainer);
   }
+
+  handleNewPointClick = () => {
+    this.createNewPoint();
+    this.#newPointComponent.toggleState(true);
+  };
+
+  #handleNewPointDestroy = () => {
+    this.#newPointComponent.toggleState(false);
+  };
 
   #renderFailedData() {
     this.#fieldComponent = new FailedDataView({
@@ -99,7 +115,6 @@ export default class BoardPresenter {
   #renderPoints () {
     this.points.forEach((point) => {
       this.#renderEvent(point);
-      this.createNewPoint(point);
     });
   }
 

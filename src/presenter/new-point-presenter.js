@@ -4,16 +4,16 @@ import {nanoid} from 'nanoid';
 import {UserAction, UpdateType} from '../util.js';
 
 export default class NewPointPresenter {
-  #taskListContainer = null;
+  #pointListContainer = null;
   #handleDataChange = null;
   #handleDestroy = null;
   #pointsModel = null;
   #point = null;
 
-  #taskEditComponent = null;
+  #pointEditComponent = null;
 
-  constructor({taskListContainer, onDataChange, onDataDestroy, pointsModel}) {
-    this.#taskListContainer = taskListContainer;
+  constructor({pointListContainer, onDataChange, onDataDestroy, pointsModel}) {
+    this.#pointListContainer = pointListContainer;
     this.#handleDataChange = onDataChange;
     this.#handleDestroy = onDataDestroy;
     this.#pointsModel = pointsModel;
@@ -21,11 +21,11 @@ export default class NewPointPresenter {
 
   init(point) {
     this.#point = point;
-    if(this.#taskEditComponent !== null) {
+    if(this.#pointEditComponent !== null) {
       return;
     }
 
-    this.#taskEditComponent = new FormEditView({
+    this.#pointEditComponent = new FormEditView({
       point: this.#point,
       destinations: this.#pointsModel.getDestination(),
       onFormSubmit: this.#handleFormSubmit,
@@ -35,7 +35,7 @@ export default class NewPointPresenter {
       isFormEdit: false
     });
 
-    render(this.#taskEditComponent, this.#taskListContainer, RenderPosition.AFTERBEGIN);
+    render(this.#pointEditComponent, this.#pointListContainer, RenderPosition.AFTERBEGIN);
 
     document.addEventListener('keydown', this.#escKeyDownHandler);
   }
@@ -48,22 +48,22 @@ export default class NewPointPresenter {
         id: nanoid(),
         ...newPoint
       }
-    )
-  }
+    );
+  };
 
   #handleDeleteClick = () => {
     this.destroy();
   };
 
   destroy() {
-    if(this.#taskEditComponent === null) {
+    if(this.#pointEditComponent === null) {
       return;
     }
 
     this.#handleDestroy();
 
-    remove(this.#taskEditComponent);
-    this.#taskEditComponent = null;
+    remove(this.#pointEditComponent);
+    this.#pointEditComponent = null;
 
     document.removeEventListener('keydown', this.#escKeyDownHandler);
   }
@@ -73,5 +73,5 @@ export default class NewPointPresenter {
       evt.preventDefault();
       this.destroy();
     }
-  }
+  };
 }
