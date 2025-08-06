@@ -14,7 +14,6 @@ class NewPointView extends AbstractView {
     `);
   }
 
-
   #clickHandler = (evt) => {
     evt.preventDefault();
     this.#handleClick();

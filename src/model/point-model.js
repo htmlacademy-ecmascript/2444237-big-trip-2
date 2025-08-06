@@ -1,21 +1,46 @@
-import { POINT_COUNT } from '../const.js';
-import { getRandomPoint } from '../mock/points.js';
+// import { POINT_COUNT } from '../const.js';
+// import { getRandomPoint } from '../mock/points.js';
 import { offersMock } from '../mock/offers.js';
 import { destinationMock } from '../mock/destination.js';
 import Observable from '../framework/observable.js';
+import { UpdateType } from '../util.js';
 
 
 export class PointsModel extends Observable {
-  #points = Array.from({length: POINT_COUNT}, getRandomPoint);
+  #pointsApiService = null;
+  #points = [];
   #offers = offersMock;
   #destination = destinationMock;
+  constructor({pointApiService}) {
+    super();
+    this.#pointsApiService = pointApiService;
+  }
+
+  async init() {
+    try {
+      this.#points = await this.#pointsApiService.points;
+      this.#offers = await this.#pointsApiService.offers;
+      this.#destination = await this.#pointsApiService.destinations;
+    } catch (err) {
+      this.#points = [];
+      this.#offers = [];
+      this.#destination = [];
+    }
+
+    this._notify(UpdateType.INIT);
+  }
 
   get points() {
     return this.#points;
   }
 
-  updatePoint(updateType, update) {
-    this.#points = this.#points.map((point) => point.id === update.id ? update : point);
+  async updatePoint(updateType, update) {
+    try {
+      const response = await this.#pointsApiService.updatePoint(update);
+      this.#points = this.#points.map((point) => point.id === update.id ? response : point);
+    } catch(err) {
+      throw new Error('Can\'t update task');
+    }
 
     this._notify(updateType, update);
   }

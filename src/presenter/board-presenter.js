@@ -1,4 +1,5 @@
-import { render, RenderPosition} from '../framework/render.js';
+import { render, RenderPosition, remove} from '../framework/render.js';
+import LoadingView from '../view/loading-view.js';
 import EventListView from '../view/event-list-view.js';
 import SortView from '../view/sort-view.js';
 import NewPointPresenter from './new-point-presenter.js';
@@ -14,9 +15,11 @@ export default class BoardPresenter {
   #pointsModel = null;
   #fieldComponent = null;
   #pointPresenters = new Map();
+  #loadingComponent = new LoadingView();
   eventListView = new EventListView();
   #sortView = null;
   #currentSortType = SortType.DAY;
+  #isLoading = true;
   #filterModel = null;
   #filterType = null;
   #newPointPresenter = null;
@@ -66,7 +69,10 @@ export default class BoardPresenter {
     this.#renderBoard();
     this.#renderSort();
 
-    render(this.#newPointComponent, this.#tripMainContainer);
+    this.#pointsModel.init().finally(() => {
+      render(this.#newPointComponent, this.#tripMainContainer);
+    });
+
   }
 
   handleNewPointClick = () => {
@@ -118,6 +124,10 @@ export default class BoardPresenter {
     });
   }
 
+  #renderLoading () {
+    render(this.#loadingComponent, this.#container, RenderPosition.AFTERBEGIN);
+  }
+
   #renderSort () {
     this.#sortView = new SortView({
       onSortTypeChange: this.#handleSortTypeChange,
@@ -154,6 +164,11 @@ export default class BoardPresenter {
         this.#clearPointList({resetSortType: true});
         this.#renderBoard();
         break;
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
+        this.#renderBoard();
+        break;
     }
   };
 
@@ -167,6 +182,8 @@ export default class BoardPresenter {
     this.#pointPresenters.clear();
     this.#newPointPresenter.destroy();
 
+    remove(this.#loadingComponent);
+
     if (resetSortType) {
       this.#currentSortType = SortType.DAY;
     }
@@ -174,8 +191,14 @@ export default class BoardPresenter {
 
   #renderBoard() {
     render(this.eventListView, this.#container);
+    remove(this.#fieldComponent);
 
     const points = this.points;
+
+    if (this.#isLoading) {
+      this.#renderLoading();
+      return;
+    }
     if (points.length === 0) {
       this.#renderFailedData();
       return;
