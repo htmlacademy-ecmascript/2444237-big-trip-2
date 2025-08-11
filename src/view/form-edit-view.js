@@ -149,7 +149,6 @@ export default class FormEditView extends AbstractStatefulView {
   #onPointDelete = null;
   #isFormEdit = null;
 
-
   constructor({
     point = EMPTY_POINT,
     destinations,
@@ -204,17 +203,27 @@ export default class FormEditView extends AbstractStatefulView {
 
   #priceChangeHandler = (evt) => {
     const intValue = parseInt(evt.target.value, 10);
-    if(isNaN(intValue) || intValue < 0) {
-      return;
-    }
 
     this._setState({
       'base_price': intValue
     });
   };
 
+  #validateForm = () => {
+    if (this._state.base_price < 0 || this._state.destination === null || this._state.date_from > this._state.date_to) {
+      return false;
+    }
+
+    return true;
+  };
+
   #handleFormSubmit = (evt) => {
     evt.preventDefault();
+    const isValid = this.#validateForm();
+    if (!isValid) {
+      this.shake();
+      return;
+    }
     this.#onFormSubmit(FormEditView.parseStateToPoint(this._state));
   };
 

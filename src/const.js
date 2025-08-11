@@ -1,5 +1,5 @@
 const POINT_COUNT = 3;
-const DATE_FORMAT = 'MMMM D';
+const DATE_FORMAT = 'MMM D';
 const TIME_FORMAT = 'HH:mm';
 const FORM_EDIT_DATE = 'DD/MM/YY HH:mm';
 
