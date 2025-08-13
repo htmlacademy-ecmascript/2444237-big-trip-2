@@ -50,7 +50,7 @@ export default class BoardPresenter {
       pointListContainer: this.eventListView.element,
       onDataChange: this.#handleViewAction,
       onDataDestroy: this.#handleNewPointDestroy,
-      pointsModel: this.#pointsModel
+      pointsModel: this.#pointsModel,
     });
 
     this.#pointsModel.addObserver(this.#handleModelEvent);
@@ -92,6 +92,11 @@ export default class BoardPresenter {
 
   #handleNewPointDestroy = () => {
     this.#newPointComponent.toggleState(false);
+    const points = this.points;
+
+    if(points.length === 0) {
+      this.#renderFailedData();
+    }
   };
 
   #renderFailedData() {
@@ -114,9 +119,10 @@ export default class BoardPresenter {
   }
 
   createNewPoint (event) {
-    this.#currentSortType = SortType.DAY;
     this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+    this.#currentSortType = SortType.DAY;
     this.#newPointPresenter.init(event);
+    remove(this.#fieldComponent);
   }
 
   #handleSortTypeChange = (sortType) => {
@@ -160,9 +166,13 @@ export default class BoardPresenter {
         break;
       case UserAction.ADD_POINT:
         this.#newPointPresenter.setSaving();
+        this.#currentSortType = SortType.DAY;
+        this.#filterType = FilterType.EVERYTHING;
+
         try {
           await this.#pointsModel.addPoint(updateType, update);
         } catch(err) {
+          // this.#newPointPresenter.shake();
           this.#newPointPresenter.setAborting();
         }
         break;
