@@ -21,13 +21,13 @@ export class PointsModel extends Observable {
       this.#points = await this.#pointsApiService.points;
       this.#offers = await this.#pointsApiService.offers;
       this.#destination = await this.#pointsApiService.destinations;
+      this._notify(UpdateType.INIT);
     } catch (err) {
       this.#points = [];
       this.#offers = [];
       this.#destination = [];
+      this._notify(UpdateType.INIT_ERROR);
     }
-
-    this._notify(UpdateType.INIT);
   }
 
   get points() {

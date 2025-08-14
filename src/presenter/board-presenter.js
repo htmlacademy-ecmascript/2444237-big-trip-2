@@ -10,7 +10,6 @@ import { SortType, sortByDay, sortByPrice, sortByTime, filter, UpdateType, UserA
 import { FilterType } from '../const.js';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 
-
 const TimeLimit = {
   LOWER_LIMIT: 350,
   UPPER_LIMIT: 1000,
@@ -99,6 +98,14 @@ export default class BoardPresenter {
     }
   };
 
+  #renderFetchError() {
+    this.#fieldComponent = new FailedDataView({
+      filterType: FilterType.EVERYTHING,
+      fetchError: true
+    });
+    render(this.#fieldComponent, this.#container);
+  }
+
   #renderFailedData() {
     this.#fieldComponent = new FailedDataView({
       filterType: this.#filterType
@@ -111,7 +118,7 @@ export default class BoardPresenter {
       pointListContainer: this.eventListView.element,
       pointsModel: this.#pointsModel,
       onDataChange: this.#handleViewAction,
-      onModeChange: this.#handleModeChange
+      onModeChange: this.#handleModeChange,
     });
 
     pointPresenter.init(event);
@@ -120,7 +127,6 @@ export default class BoardPresenter {
 
   createNewPoint (event) {
     this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
-    this.#currentSortType = SortType.DAY;
     this.#newPointPresenter.init(event);
     remove(this.#fieldComponent);
   }
@@ -153,6 +159,12 @@ export default class BoardPresenter {
     render(this.#sortView, this.#container, RenderPosition.AFTERBEGIN);
   }
 
+  #resetSortType () {
+    remove(this.#sortView);
+    this.#currentSortType = SortType.DAY;
+    this.#renderSort();
+  }
+
   #handleViewAction = async (actionType, updateType, update) => {
     this.#uiBlocker.block();
     switch (actionType) {
@@ -166,13 +178,10 @@ export default class BoardPresenter {
         break;
       case UserAction.ADD_POINT:
         this.#newPointPresenter.setSaving();
-        this.#currentSortType = SortType.DAY;
-        this.#filterType = FilterType.EVERYTHING;
-
         try {
           await this.#pointsModel.addPoint(updateType, update);
         } catch(err) {
-          // this.#newPointPresenter.shake();
+          this.#newPointPresenter.shake();
           this.#newPointPresenter.setAborting();
         }
         break;
@@ -206,6 +215,11 @@ export default class BoardPresenter {
         remove(this.#loadingComponent);
         this.#renderBoard();
         break;
+      case UpdateType.INIT_ERROR:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
+        this.#renderFetchError();
+        break;
     }
   };
 
@@ -222,7 +236,7 @@ export default class BoardPresenter {
     remove(this.#loadingComponent);
 
     if (resetSortType) {
-      this.#currentSortType = SortType.DAY;
+      this.#resetSortType();
     }
   }
 

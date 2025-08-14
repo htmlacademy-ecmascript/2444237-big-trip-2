@@ -140,6 +140,7 @@ export default class PointPresenter {
   };
 
   #handleClickFormClose = () => {
+    this.#pointEditComponent.reset(this.#point);
     this.#replaceEditFormToPoint();
     document.removeEventListener('keydown', this.#escKeyDownHandler);
   };

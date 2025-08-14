@@ -84,7 +84,7 @@ function createFormEditTemplate(point, destinations, getOfferByType, isFormEdit)
   const offerByType = getOfferByType(point.type) || [];
   const pointDestination = destinations.find((element) => element.id === point.destination);
   return (
-    `<form class="event event--edit" action="#" method="post"}>
+    `<li class="trip-events__item"> <form class="event event--edit" action="#" method="post"}>
       <header class="event__header">
         <div class="event__type-wrapper">
           <label class="event__type  event__type-btn" for="event-type-toggle-1">
@@ -97,10 +97,9 @@ function createFormEditTemplate(point, destinations, getOfferByType, isFormEdit)
               <label class="event__label  event__type-output" for="event-destination-1">
                 ${point.type}
               </label>
-              ${destinations.map((element) => `
                 <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${pointDestination?.name || '' }" ${point.is_disabled ? 'disabled' : ''} list="destination-list-1">
               <datalist id="destination-list-1">
-                <option value="${element.name}"></option>`)}
+                ${destinations.map((destination) => `<option value="${destination.name}"></option>`).join('')}
               </datalist>
             </div>
 
@@ -123,20 +122,20 @@ function createFormEditTemplate(point, destinations, getOfferByType, isFormEdit)
         </header>
         <section class="event__details">
             ${renderPointOffers(offerByType, point.offers, point.id, point.is_disabled)}
+            ${pointDestination && pointDestination.description ? `
             <section class="event__section  event__section--destination">
-              <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-              <p class="event__destination-description">${pointDestination?.description || ''}</p>
-                <div class="event__photos-container">
+            <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+            <p class="event__destination-description">${pointDestination?.description || ''}</p>
+            ${pointDestination.pictures?.length > 0 ? ` <div class="event__photos-container">
                       <div class="event__photos-tape">
-                          ${pointDestination?.pictures.map((picture) =>
-      `<img class="event__photo"
+                          ${pointDestination?.pictures.map((picture) => `<img class="event__photo"
                                 src="${picture.src}"
                                 alt="${picture.description}">`).join('') || ''}
                       </div>
-                    </div>
-            </section>
+                    </div>` : ''}
+            </section>` : ''}
         </section>
-    </form>`
+    </form><li`
   );
 }
 
@@ -281,7 +280,10 @@ export default class FormEditView extends AbstractStatefulView {
   };
 
   reset(point) {
-    this._setState(FormEditView.parsePointToState(point));
+    this.updateElement(
+      FormEditView.parsePointToState(point)
+    );
+    // this._setState(FormEditView.parsePointToState(point));
   }
 
   removeElement() {
