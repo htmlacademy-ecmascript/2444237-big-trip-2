@@ -8,7 +8,12 @@ import FailedDataView from '../view/failed-data.js';
 import PointPresenter from './point-presenter.js';
 import { SortType, sortByDay, sortByPrice, sortByTime, filter, UpdateType, UserAction} from '../util.js';
 import { FilterType } from '../const.js';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};
 
 export default class BoardPresenter {
   #container = null;
@@ -25,6 +30,10 @@ export default class BoardPresenter {
   #newPointPresenter = null;
   #tripMainContainer = null;
   #newPointComponent = null;
+  #uiBlocker = new UiBlocker({
+    lowerLimit: TimeLimit.LOWER_LIMIT,
+    upperLimit: TimeLimit.UPPER_LIMIT
+  });
 
   constructor({container, pointsModel, filterModel, tripMainContainer}) {
     this.#container = container;
@@ -40,7 +49,7 @@ export default class BoardPresenter {
       pointListContainer: this.eventListView.element,
       onDataChange: this.#handleViewAction,
       onDataDestroy: this.#handleNewPointDestroy,
-      pointsModel: this.#pointsModel
+      pointsModel: this.#pointsModel,
     });
 
     this.#pointsModel.addObserver(this.#handleModelEvent);
@@ -82,7 +91,20 @@ export default class BoardPresenter {
 
   #handleNewPointDestroy = () => {
     this.#newPointComponent.toggleState(false);
+    const points = this.points;
+
+    if(points.length === 0) {
+      this.#renderFailedData();
+    }
   };
+
+  #renderFetchError() {
+    this.#fieldComponent = new FailedDataView({
+      filterType: FilterType.EVERYTHING,
+      fetchError: true
+    });
+    render(this.#fieldComponent, this.#container);
+  }
 
   #renderFailedData() {
     this.#fieldComponent = new FailedDataView({
@@ -96,7 +118,7 @@ export default class BoardPresenter {
       pointListContainer: this.eventListView.element,
       pointsModel: this.#pointsModel,
       onDataChange: this.#handleViewAction,
-      onModeChange: this.#handleModeChange
+      onModeChange: this.#handleModeChange,
     });
 
     pointPresenter.init(event);
@@ -104,9 +126,9 @@ export default class BoardPresenter {
   }
 
   createNewPoint (event) {
-    this.#currentSortType = SortType.DAY;
     this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
     this.#newPointPresenter.init(event);
+    remove(this.#fieldComponent);
   }
 
   #handleSortTypeChange = (sortType) => {
@@ -137,18 +159,42 @@ export default class BoardPresenter {
     render(this.#sortView, this.#container, RenderPosition.AFTERBEGIN);
   }
 
-  #handleViewAction = (actionType, updateType, update) => {
+  #resetSortType () {
+    remove(this.#sortView);
+    this.#currentSortType = SortType.DAY;
+    this.#renderSort();
+  }
+
+  #handleViewAction = async (actionType, updateType, update) => {
+    this.#uiBlocker.block();
     switch (actionType) {
       case UserAction.UPDATE_POINT:
-        this.#pointsModel.updatePoint(updateType, update);
+        this.#pointPresenters.get(update.id).setSaving();
+        try {
+          await this.#pointsModel.updatePoint(updateType, update);
+        }catch(err) {
+          this.#pointPresenters.get(update.id).setAborting();
+        }
         break;
       case UserAction.ADD_POINT:
-        this.#pointsModel.addPoint(updateType, update);
+        this.#newPointPresenter.setSaving();
+        try {
+          await this.#pointsModel.addPoint(updateType, update);
+        } catch(err) {
+          this.#newPointPresenter.shake();
+          this.#newPointPresenter.setAborting();
+        }
         break;
       case UserAction.DELETE_POINT:
-        this.#pointsModel.deletePoint(updateType, update);
+        this.#pointPresenters.get(update.id).setDeleting();
+        try {
+          await this.#pointsModel.deletePoint(updateType, update);
+        } catch(err) {
+          this.#pointPresenters.get(update.id).setAborting();
+        }
         break;
     }
+    this.#uiBlocker.unblock();
   };
 
   #handleModelEvent = (updateType, data) => {
@@ -169,6 +215,11 @@ export default class BoardPresenter {
         remove(this.#loadingComponent);
         this.#renderBoard();
         break;
+      case UpdateType.INIT_ERROR:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
+        this.#renderFetchError();
+        break;
     }
   };
 
@@ -185,7 +236,7 @@ export default class BoardPresenter {
     remove(this.#loadingComponent);
 
     if (resetSortType) {
-      this.#currentSortType = SortType.DAY;
+      this.#resetSortType();
     }
   }
 

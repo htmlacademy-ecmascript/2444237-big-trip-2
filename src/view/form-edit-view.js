@@ -9,27 +9,29 @@ const EMPTY_POINT = {
   'base_price': 1000,
   'is_favorite': false,
   'offers': [],
+  'date_from': '2022-01-01T00:00:00.000Z',
+  'date_to': '2022-01-01T00:00:00.000Z',
   'type': 'flight'
 };
 
-const renderTypes = (pointType) => (
+const renderTypes = (pointType, isDisabled) => (
   `<div class="event__type-list">
       <fieldset class="event__type-group">
         <legend class="visually-hidden">Event type</legend>
         ${TypePoint.map((type) => `
             <div class="event__type-item">
-                <input id="event-type-${type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}" ${type === pointType ? 'checked' : ''}>
+                <input id="event-type-${type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}" ${type === pointType ? 'checked' : ''} ${isDisabled ? 'disabled' : ''}>
                 <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${type}</label>
             </div>`).join('\n')}
         </fieldset>
       </div>
     </div>`
 );
-const renderButtonsFormEdit = (isEditForm) => {
+const renderButtonsFormEdit = (isEditForm, isDisabled, isSaving, isDeleting) => {
   if (isEditForm) {
     return (
-      `<button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-          <button class="event__reset-btn" type="reset">Delete</button>
+      `<button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>${isSaving ? 'Saving...' : 'Save'}</button>
+          <button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>${isDeleting ? 'Deleting...' : 'Delete'}</button>
           <button class="event__rollup-btn" type="button">
               <span class="visually-hidden">Open event</span>
           </button>
@@ -37,14 +39,14 @@ const renderButtonsFormEdit = (isEditForm) => {
   }
 
   return (
-    `<button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-     <button class="event__reset-btn" type="reset">Cancel</button>
+    `<button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>${isSaving ? 'Saving...' : 'Save'}</button>
+     <button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>Cancel</button>
         <button class="event__rollup-btn" type="button">
             <span class="visually-hidden">Open event</span>
         </button>
     `);
 };
-const renderPointOffers = (allOffers, pointOffers, pointId) => {
+const renderPointOffers = (allOffers, pointOffers, pointId, isDisabled) => {
   if(allOffers.length === 0) {
     return '';
   }
@@ -65,6 +67,7 @@ const renderPointOffers = (allOffers, pointOffers, pointId) => {
                 type="checkbox"
                 name="event_offer_${offer.id}"
                   ${isChecked ? 'checked' : ''}
+                  ${isDisabled ? 'disabled' : ''}
                 >
                 <label class="event__offer-label" for="event_offer_${offer.id}_${pointId}">
                     <span class="event__offer-title">${offer.title}</span>
@@ -81,7 +84,7 @@ function createFormEditTemplate(point, destinations, getOfferByType, isFormEdit)
   const offerByType = getOfferByType(point.type) || [];
   const pointDestination = destinations.find((element) => element.id === point.destination);
   return (
-    `<form class="event event--edit" action="#" method="post">
+    `<li class="trip-events__item"> <form class="event event--edit" action="#" method="post"}>
       <header class="event__header">
         <div class="event__type-wrapper">
           <label class="event__type  event__type-btn" for="event-type-toggle-1">
@@ -89,24 +92,23 @@ function createFormEditTemplate(point, destinations, getOfferByType, isFormEdit)
             <img class="event__type-icon" width="17" height="17" src="img/icons/${point.type}.png" alt="Event type icon">
           </label>
           <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
-            ${renderTypes(point.type)}
+            ${renderTypes(point.type, point.is_disabled)}
             <div class="event__field-group  event__field-group--destination">
               <label class="event__label  event__type-output" for="event-destination-1">
                 ${point.type}
               </label>
-              ${destinations.map((element) => `
-                <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${pointDestination?.name || '' }" list="destination-list-1">
+                <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${pointDestination?.name || '' }" ${point.is_disabled ? 'disabled' : ''} list="destination-list-1">
               <datalist id="destination-list-1">
-                <option value="${element.name}"></option>`)}
+                ${destinations.map((destination) => `<option value="${destination.name}"></option>`).join('')}
               </datalist>
             </div>
 
             <div class="event__field-group  event__field-group--time">
               <label class="visually-hidden" for="event-start-time-1">From</label>
-              <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${humanizeDate(point.date_from, FORM_EDIT_DATE)}">
+              <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${humanizeDate(point.date_from, FORM_EDIT_DATE)}" ${point.is_disabled ? 'disabled' : ''}>
               &mdash;
               <label class="visually-hidden" for="event-end-time-1">To</label>
-              <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${humanizeDate(point.date_to, FORM_EDIT_DATE)}">
+              <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${humanizeDate(point.date_to, FORM_EDIT_DATE)}" ${point.is_disabled ? 'disabled' : ''}>
             </div>
 
             <div class="event__field-group  event__field-group--price">
@@ -116,24 +118,24 @@ function createFormEditTemplate(point, destinations, getOfferByType, isFormEdit)
               </label>
               <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${point.base_price}">
             </div>
-              ${renderButtonsFormEdit(isFormEdit)}
+              ${renderButtonsFormEdit(isFormEdit, point.is_disabled, point.is_saving, point.is_deleting)}
         </header>
         <section class="event__details">
-            ${renderPointOffers(offerByType, point.offers, point.id)}
+            ${renderPointOffers(offerByType, point.offers, point.id, point.is_disabled)}
+            ${pointDestination && pointDestination.description ? `
             <section class="event__section  event__section--destination">
-              <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-              <p class="event__destination-description">${pointDestination?.description || ''}</p>
-                <div class="event__photos-container">
+            <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+            <p class="event__destination-description">${pointDestination?.description || ''}</p>
+            ${pointDestination.pictures?.length > 0 ? ` <div class="event__photos-container">
                       <div class="event__photos-tape">
-                          ${pointDestination?.pictures.map((picture) =>
-      `<img class="event__photo"
+                          ${pointDestination?.pictures.map((picture) => `<img class="event__photo"
                                 src="${picture.src}"
                                 alt="${picture.description}">`).join('') || ''}
                       </div>
-                    </div>
-            </section>
+                    </div>` : ''}
+            </section>` : ''}
         </section>
-    </form>`
+    </form><li`
   );
 }
 
@@ -145,7 +147,6 @@ export default class FormEditView extends AbstractStatefulView {
   #onClickFormClose = null;
   #onPointDelete = null;
   #isFormEdit = null;
-
 
   constructor({
     point = EMPTY_POINT,
@@ -201,17 +202,27 @@ export default class FormEditView extends AbstractStatefulView {
 
   #priceChangeHandler = (evt) => {
     const intValue = parseInt(evt.target.value, 10);
-    if(isNaN(intValue) || intValue < 0) {
-      return;
-    }
 
     this._setState({
       'base_price': intValue
     });
   };
 
+  #validateForm = () => {
+    if (this._state.base_price < 0 || this._state.destination === null || this._state.date_from > this._state.date_to) {
+      return false;
+    }
+
+    return true;
+  };
+
   #handleFormSubmit = (evt) => {
     evt.preventDefault();
+    const isValid = this.#validateForm();
+    if (!isValid) {
+      this.shake();
+      return;
+    }
     this.#onFormSubmit(FormEditView.parseStateToPoint(this._state));
   };
 
@@ -269,7 +280,10 @@ export default class FormEditView extends AbstractStatefulView {
   };
 
   reset(point) {
-    this._setState(FormEditView.parsePointToState(point));
+    this.updateElement(
+      FormEditView.parsePointToState(point)
+    );
+    // this._setState(FormEditView.parsePointToState(point));
   }
 
   removeElement() {
@@ -282,10 +296,18 @@ export default class FormEditView extends AbstractStatefulView {
   }
 
   static parsePointToState(point) {
-    return {...point};
+    return {...point,
+      'is_disabled': false,
+      'is_deleting': false,
+      'is_saving': false
+    };
   }
 
   static parseStateToPoint(state) {
-    return {...state};
+    const point = {...state};
+    delete point['is_disabled'];
+    delete point['is_deleting'];
+    delete point['is_saving'];
+    return point;
   }
 }

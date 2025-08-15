@@ -21,13 +21,13 @@ export class PointsModel extends Observable {
       this.#points = await this.#pointsApiService.points;
       this.#offers = await this.#pointsApiService.offers;
       this.#destination = await this.#pointsApiService.destinations;
+      this._notify(UpdateType.INIT);
     } catch (err) {
       this.#points = [];
       this.#offers = [];
       this.#destination = [];
+      this._notify(UpdateType.INIT_ERROR);
     }
-
-    this._notify(UpdateType.INIT);
   }
 
   get points() {
@@ -46,18 +46,24 @@ export class PointsModel extends Observable {
   }
 
   addPoint(updateType, update) {
-    this.#points = [
-      update,
-      ...this.#points
-    ];
-
-    this._notify(updateType, update);
+    try {
+      const response = this.#pointsApiService.addPoint(update);
+      this._notify(updateType, update);
+      return response;
+    } catch(err) {
+      throw new Error('Can\'t add task');
+    }
   }
 
-  deletePoint(updateType, update) {
-    this.#points = this.#points.filter((point) => point.id !== update.id);
+  async deletePoint(updateType, update) {
+    try {
+      await this.#pointsApiService.deletePoint(update);
+      this.#points = this.#points.filter((point) => point.id !== update.id);
 
-    this._notify(updateType);
+      this._notify(updateType);
+    } catch(err) {
+      throw new Error('Can\'t delete task');
+    }
   }
 
   getOffers() {

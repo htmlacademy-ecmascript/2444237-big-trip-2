@@ -11,13 +11,26 @@ function getRandomPointArray(pointArray) {
 }
 
 function getDuration(dateFrom, dateTo) {
-  const diffInMinutes = dayjs(dateTo).diff(dayjs(dateFrom), 'minute');
-  const hours = Math.floor(diffInMinutes / 60);
-  const minutes = diffInMinutes % 60;
-  if (hours === 0) {
-    return `${minutes}M`;
+  const totalMinutes = dayjs(dateTo).diff(dayjs(dateFrom), 'minute');
+  const days = Math.floor(totalMinutes / (24 * 60));
+  const hours = Math.floor((totalMinutes % (24 * 60)) / 60);
+  const minutes = totalMinutes % 60;
+
+  if (totalMinutes < 60) {
+    return `${totalMinutes}M`;
+  } else if (days === 0) {
+    const hoursString = hours.toString().padStart(2, '0');
+    if(minutes === 0) {
+      return `${hoursString}H 00M`;
+    }
+    const minutesString = minutes.toString().padStart(2, '0');
+    return `${hoursString}H ${minutesString}M`;
+  } else {
+    const daysString = days < 10 ? days.toString().padStart(2, '0') : `${days}`;
+    const hoursString = hours.toString().padStart(2, '0');
+    const minutesString = minutes.toString().padStart(2, '0');
+    return `${daysString}D ${hoursString}H ${minutesString}M`;
   }
-  return `${hours}H ${minutes}M`;
 }
 
 const filter = {
@@ -44,6 +57,7 @@ const NoPointsTextType = {
   [FilterType.FUTURE]: 'There are no future events now',
   [FilterType.PRESENT]: 'There are no present events now',
   [FilterType.PAST]: 'There are no past events now',
+  fetchError: 'Failed to load latest route information'
 };
 
 const UpdateType = {

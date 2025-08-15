@@ -20,7 +20,7 @@ const filterModel = new FilterModel();
 const filterPresenter = new FilterPresenter({
   filtersContainer: filterControlsContainer,
   filtersModel: filterModel,
-  pointsModel: pointsModel
+  pointsModel: pointsModel,
 });
 
 const boardPresenter = new BoardPresenter({
