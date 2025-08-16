@@ -6,11 +6,11 @@ import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 
 const EMPTY_POINT = {
-  'base_price': 1000,
+  'base_price': 0,
   'is_favorite': false,
   'offers': [],
-  'date_from': '2022-01-01T00:00:00.000Z',
-  'date_to': '2022-01-01T00:00:00.000Z',
+  'date_from': '',
+  'date_to': '',
   'type': 'flight'
 };
 
@@ -105,10 +105,10 @@ function createFormEditTemplate(point, destinations, getOfferByType, isFormEdit)
 
             <div class="event__field-group  event__field-group--time">
               <label class="visually-hidden" for="event-start-time-1">From</label>
-              <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${humanizeDate(point.date_from, FORM_EDIT_DATE)}" ${point.is_disabled ? 'disabled' : ''}>
+              <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${ point.date_from ? humanizeDate(point.date_from, FORM_EDIT_DATE) : ''}" ${point.is_disabled ? 'disabled' : ''}>
               &mdash;
               <label class="visually-hidden" for="event-end-time-1">To</label>
-              <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${humanizeDate(point.date_to, FORM_EDIT_DATE)}" ${point.is_disabled ? 'disabled' : ''}>
+              <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${ point.date_from ? humanizeDate(point.date_to, FORM_EDIT_DATE) : ''}" ${point.is_disabled ? 'disabled' : ''}>
             </div>
 
             <div class="event__field-group  event__field-group--price">
@@ -208,13 +208,9 @@ export default class FormEditView extends AbstractStatefulView {
     });
   };
 
-  #validateForm = () => {
-    if (this._state.base_price < 0 || this._state.destination === null || this._state.date_from > this._state.date_to) {
-      return false;
-    }
-
-    return true;
-  };
+  #validateForm = () => this._state.base_price >= 0 &&
+  this._state.destination !== null &&
+  this._state.date_from <= this._state.date_to;
 
   #handleFormSubmit = (evt) => {
     evt.preventDefault();
@@ -247,6 +243,7 @@ export default class FormEditView extends AbstractStatefulView {
   };
 
   #dateChangeHandler = (userDate) => {
+    console.log(userDate);
     this.updateElement({
       'date_from': userDate[0],
       'date_to': userDate[1]
@@ -283,7 +280,6 @@ export default class FormEditView extends AbstractStatefulView {
     this.updateElement(
       FormEditView.parsePointToState(point)
     );
-    // this._setState(FormEditView.parsePointToState(point));
   }
 
   removeElement() {
