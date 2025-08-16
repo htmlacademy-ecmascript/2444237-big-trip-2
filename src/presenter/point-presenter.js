@@ -3,7 +3,6 @@ import EventView from '../view/point-view';
 import FormEditView from '../view/form-edit-view';
 import { UserAction, UpdateType } from '../util';
 
-
 const Mode = {
   DEFAULT: 'DEFAULT',
   EDITING: 'EDITING',

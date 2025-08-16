@@ -11,7 +11,7 @@ const createFailedDataTemplate = (filterType, fetchError) => (
   </p>`
 );
 
-class FailedDataView extends AbstractView {
+export default class FailedDataView extends AbstractView {
   #filterType = null;
   #isfetchError = null;
   constructor({filterType, fetchError}) {
@@ -25,4 +25,3 @@ class FailedDataView extends AbstractView {
   }
 }
 
-export default FailedDataView;
