@@ -87,7 +87,7 @@ function sortByTime(pointA, pointB) {
 }
 
 function humanizeDate(date, format = DATE_FORMAT) {
-  return dayjs(date).format(format);
+  return date ? dayjs(date).format(format) : '';
 }
 
 

@@ -45,8 +45,9 @@ export default class PointsModel extends Observable {
   async addPoint(updateType, update) {
     try {
       const response = await this.#pointsApiService.addPoint(update);
+      this.#points = [...this.#points, response];
+
       this._notify(updateType, update);
-      return response;
     } catch(err) {
       throw new Error('Can\'t add task');
     }
