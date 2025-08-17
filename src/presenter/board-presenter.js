@@ -30,6 +30,7 @@ export default class BoardPresenter {
   #newPointPresenter = null;
   #tripMainContainer = null;
   #newPointComponent = null;
+
   #uiBlocker = new UiBlocker({
     lowerLimit: TimeLimit.LOWER_LIMIT,
     upperLimit: TimeLimit.UPPER_LIMIT
@@ -181,7 +182,6 @@ export default class BoardPresenter {
         try {
           await this.#pointsModel.addPoint(updateType, update);
         } catch(err) {
-          this.#newPointPresenter.shake();
           this.#newPointPresenter.setAborting();
         }
         break;

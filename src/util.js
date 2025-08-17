@@ -3,6 +3,9 @@ import { DATE_FORMAT, FilterType} from './const.js';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 
+const MINUTES_IN_HOUR = 60;
+const HOURS_IN_DAY = 24;
+
 dayjs.extend(isSameOrBefore);
 dayjs.extend(isSameOrAfter);
 
@@ -12,11 +15,11 @@ function getRandomPointArray(pointArray) {
 
 function getDuration(dateFrom, dateTo) {
   const totalMinutes = dayjs(dateTo).diff(dayjs(dateFrom), 'minute');
-  const days = Math.floor(totalMinutes / (24 * 60));
-  const hours = Math.floor((totalMinutes % (24 * 60)) / 60);
-  const minutes = totalMinutes % 60;
+  const days = Math.floor(totalMinutes / (HOURS_IN_DAY * MINUTES_IN_HOUR));
+  const hours = Math.floor((totalMinutes % (HOURS_IN_DAY * MINUTES_IN_HOUR)) / MINUTES_IN_HOUR);
+  const minutes = totalMinutes % MINUTES_IN_HOUR;
 
-  if (totalMinutes < 60) {
+  if (totalMinutes < MINUTES_IN_HOUR) {
     return `${totalMinutes}M`;
   } else if (days === 0) {
     const hoursString = hours.toString().padStart(2, '0');
@@ -84,11 +87,8 @@ function sortByTime(pointA, pointB) {
 }
 
 function humanizeDate(date, format = DATE_FORMAT) {
-  return dayjs(date).format(format);
+  return date ? dayjs(date).format(format) : '';
 }
 
-function updateItem (items, update) {
-  return items.map((item) => item.id === update.id ? update : item);
-}
 
-export { getRandomPointArray, getDuration, humanizeDate, filter, updateItem, SortType, sortByDay, sortByPrice, sortByTime, TypePoint, UserAction, UpdateType, NoPointsTextType};
+export { getRandomPointArray, getDuration, humanizeDate, filter, SortType, sortByDay, sortByPrice, sortByTime, TypePoint, UserAction, UpdateType, NoPointsTextType};

@@ -6,11 +6,11 @@ import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 
 const EMPTY_POINT = {
-  'base_price': 1000,
+  'base_price': 0,
   'is_favorite': false,
   'offers': [],
-  'date_from': '2022-01-01T00:00:00.000Z',
-  'date_to': '2022-01-01T00:00:00.000Z',
+  'date_from': undefined,
+  'date_to': undefined,
   'type': 'flight'
 };
 
@@ -208,13 +208,9 @@ export default class FormEditView extends AbstractStatefulView {
     });
   };
 
-  #validateForm = () => {
-    if (this._state.base_price < 0 || this._state.destination === null || this._state.date_from > this._state.date_to) {
-      return false;
-    }
-
-    return true;
-  };
+  #validateForm = () => this._state.base_price >= 0 &&
+  this._state.destination !== null &&
+  this._state.date_from <= this._state.date_to;
 
   #handleFormSubmit = (evt) => {
     evt.preventDefault();
@@ -266,7 +262,9 @@ export default class FormEditView extends AbstractStatefulView {
 
 
   #setFlatpicker = () => {
-    const defaultDate = (this._state.date_from !== this._state.date_to) ? [this._state.date_from, this._state.date_to] : [this._state.date_from];
+    const defaultDate = (this._state.date_from !== this._state.date_to)
+      ? [this._state.date_from, this._state.date_to]
+      : [this._state.date_from];
     this.#flatpickr = flatpickr(
       this.element.querySelector('.event__field-group--time'),
       {
@@ -283,7 +281,6 @@ export default class FormEditView extends AbstractStatefulView {
     this.updateElement(
       FormEditView.parsePointToState(point)
     );
-    // this._setState(FormEditView.parsePointToState(point));
   }
 
   removeElement() {

@@ -1,16 +1,13 @@
-// import { POINT_COUNT } from '../const.js';
-// import { getRandomPoint } from '../mock/points.js';
-import { offersMock } from '../mock/offers.js';
-import { destinationMock } from '../mock/destination.js';
+
 import Observable from '../framework/observable.js';
 import { UpdateType } from '../util.js';
 
 
-export class PointsModel extends Observable {
+export default class PointsModel extends Observable {
   #pointsApiService = null;
   #points = [];
-  #offers = offersMock;
-  #destination = destinationMock;
+  #offers = [];
+  #destination = [];
   constructor({pointApiService}) {
     super();
     this.#pointsApiService = pointApiService;
@@ -45,11 +42,12 @@ export class PointsModel extends Observable {
     this._notify(updateType, update);
   }
 
-  addPoint(updateType, update) {
+  async addPoint(updateType, update) {
     try {
-      const response = this.#pointsApiService.addPoint(update);
+      const response = await this.#pointsApiService.addPoint(update);
+      this.#points = [...this.#points, response];
+
       this._notify(updateType, update);
-      return response;
     } catch(err) {
       throw new Error('Can\'t add task');
     }
@@ -70,20 +68,8 @@ export class PointsModel extends Observable {
     return this.#offers;
   }
 
-  getOffersById(id) {
-    const offers = this.getOffers();
-
-    return offers.find((offer) => offer.id === id);
-  }
-
   getDestination() {
     return this.#destination;
-  }
-
-  getPointById(id) {
-    const points = this.points;
-
-    return points.find((point) => point.id === id);
   }
 
   getOfferByType(type) {

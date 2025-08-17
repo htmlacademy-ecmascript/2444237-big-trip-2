@@ -1,6 +1,6 @@
 import AbstractView from '../framework/view/abstract-view.js';
 
-class NewPointView extends AbstractView {
+export default class NewPointView extends AbstractView {
   #handleClick = null;
   constructor({onClick}) {
     super();
@@ -24,4 +24,3 @@ class NewPointView extends AbstractView {
   }
 }
 
-export default NewPointView;
