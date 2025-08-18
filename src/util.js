@@ -9,10 +9,6 @@ const HOURS_IN_DAY = 24;
 dayjs.extend(isSameOrBefore);
 dayjs.extend(isSameOrAfter);
 
-function getRandomPointArray(pointArray) {
-  return pointArray[Math.floor(Math.random() * pointArray.length)];
-}
-
 function getDuration(dateFrom, dateTo) {
   const totalMinutes = dayjs(dateTo).diff(dayjs(dateFrom), 'minute');
   const days = Math.floor(totalMinutes / (HOURS_IN_DAY * MINUTES_IN_HOUR));
