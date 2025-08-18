@@ -87,4 +87,4 @@ function humanizeDate(date, format = DATE_FORMAT) {
 }
 
 
-export { getRandomPointArray, getDuration, humanizeDate, filter, SortType, sortByDay, sortByPrice, sortByTime, TypePoint, UserAction, UpdateType, NoPointsTextType};
+export { getDuration, humanizeDate, filter, SortType, sortByDay, sortByPrice, sortByTime, TypePoint, UserAction, UpdateType, NoPointsTextType};
